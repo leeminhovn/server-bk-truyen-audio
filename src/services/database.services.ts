@@ -1,6 +1,5 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { chapter } from "~/models/schemas/Chapter.scheme";
-import Post from "~/models/schemas/Post.schemas";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { Story } from "~/models/schemas/Story.scheme";
 import User from "~/models/schemas/User.schemas";
@@ -29,9 +28,7 @@ class datanaseServices {
   get users(): Collection<User> {
     return this.db.collection(process.env.DB_USERS_COLLECTION || "");
   }
-  get posts(): Collection<Post> {
-    return this.db.collection(process.env.DB_POSTS_COLLECTION || "");
-  }
+
   get refreshTokens(): Collection<RefreshTokenSchema> {
     return this.db.collection(process.env.DB_REFRESHTOKENS_COLLECTION || "");
   }
