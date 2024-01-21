@@ -4,7 +4,9 @@ import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { Story } from "~/models/schemas/Story.scheme";
 import User from "~/models/schemas/User.schemas";
 
-const uri = `mongodb//${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_IP}:${process.env.DP_PORT}`;
+const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
+  process.env.DB_PASSWORD || "",
+)}@${process.env.DB_IP}:${process.env.DP_PORT}`;
 
 class datanaseServices {
   private client: MongoClient;
@@ -15,7 +17,7 @@ class datanaseServices {
   }
   async connect() {
     try {
-      this.db.command({ ping: 1 });
+      await this.db.command({ ping: 1 });
       console.log(
         "Pinged your deployment. You successfully connected to MongoDB!",
       );
