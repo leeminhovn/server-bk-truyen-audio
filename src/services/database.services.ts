@@ -4,7 +4,7 @@ import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { Story } from "~/models/schemas/Story.scheme";
 import User from "~/models/schemas/User.schemas";
 
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.fpngdpn.mongodb.net/`;
+const uri = `mongodb//${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_IP}:${process.env.DP_PORT}`;
 
 class datanaseServices {
   private client: MongoClient;
