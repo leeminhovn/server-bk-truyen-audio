@@ -13,7 +13,6 @@ export const uploadStoryController = async (req: Request, res: Response) => {
       chapters,
       story_genre,
     } = req.body;
-    console.log(req.body);
     const data_story: InsertOneResult<Story> = await storysServices.uploadStory(
       {
         story_name,

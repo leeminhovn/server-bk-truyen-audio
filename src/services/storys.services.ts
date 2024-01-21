@@ -6,13 +6,13 @@ class storyServices {
   constructor() {}
   async uploadStory(story_info: Story, chapters: Array<chapter>) {
     const result = await databaseServices.storys.insertOne(story_info);
-    console.log(chapters);
     const resultChapterInsert = await databaseServices.chapters.insertMany(
       chapters.map((chapter) => {
         chapter.story_id = result.insertedId;
         return chapter;
       }),
     );
+
     return result;
   }
 }

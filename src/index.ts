@@ -7,7 +7,7 @@ import datanaseServices from "~/services/database.services";
 import storyRouter from "./routes/storys.routes";
 import cors from "cors";
 
-datanaseServices.connect();
+ datanaseServices.connect();
 
 const app = express();
 
