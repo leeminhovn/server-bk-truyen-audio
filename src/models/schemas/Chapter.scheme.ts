@@ -8,7 +8,7 @@ interface ChapterType {
   created_at?: Date;
   updated_at?: Date;
 }
-export class chapter {
+export class Chapter {
   _id?: ObjectId;
   chapter_name: String;
   story_id: ObjectId;

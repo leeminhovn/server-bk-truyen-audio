@@ -27,7 +27,9 @@ export class Story {
     this.story_name = story.story_name;
     this.auhtor_name = story.auhtor_name;
     this.story_quick_review = story.story_quick_review;
-    this.story_genre= story.story_genre;
+    this.story_genre = story.story_genre;
     this.completed_status = story.completed_status;
+    this.created_at = story.created_at || dateNow;
+    this.updated_at = story.updated_at || dateNow;
   }
 }

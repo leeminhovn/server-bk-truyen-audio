@@ -14,13 +14,13 @@ export const uploadStoryController = async (req: Request, res: Response) => {
       story_genre,
     } = req.body;
     const data_story: InsertOneResult<Story> = await storysServices.uploadStory(
-      {
+      new Story({
         story_name,
         auhtor_name,
         story_quick_review,
         completed_status,
         story_genre,
-      },
+      }),
       chapters,
     );
     res.status(200).json({ message: "success insert story" });
