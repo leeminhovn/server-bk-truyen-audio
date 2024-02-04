@@ -5,7 +5,6 @@ import { TokenType, UserVerifyStatus } from "~/constants/enum";
 import { hasPassword } from "~/models/schemas/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { ObjectId } from "mongodb";
-import { error } from "console";
 class userService {
   private signAccessToken(user_id: string): Promise<string> {
     return signJwt({

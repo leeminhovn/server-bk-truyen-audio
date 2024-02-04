@@ -1,5 +1,5 @@
 import { Collection, Db, MongoClient } from "mongodb";
-import { chapter } from "~/models/schemas/Chapter.scheme";
+import { Chapter } from "~/models/schemas/Chapter.scheme";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { Story } from "~/models/schemas/Story.scheme";
 import User from "~/models/schemas/User.schemas";
@@ -37,7 +37,7 @@ class datanaseServices {
   get storys(): Collection<Story> {
     return this.db.collection(process.env.DB_STORYS_COLLECTION || "");
   }
-  get chapters(): Collection<chapter> {
+  get chapters(): Collection<Chapter> {
     return this.db.collection(process.env.DB_CHAPTERS_COLLECTION || "");
   }
 }
