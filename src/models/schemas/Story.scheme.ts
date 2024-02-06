@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { StoryCompletedStatus } from "~/constants/enum";
+import { StoryCompletedStatus } from "src/constants/enum";
 
 interface StoryType {
   _id?: ObjectId;

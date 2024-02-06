@@ -1,6 +1,6 @@
-import { Story } from "~/models/schemas/Story.scheme";
+import { Story } from "src/models/schemas/Story.scheme";
 import databaseServices from "./database.services";
-import { Chapter } from "~/models/schemas/Chapter.scheme";
+import { Chapter } from "src/models/schemas/Chapter.scheme";
 import { Collection } from "mongodb";
 
 class storyServices {

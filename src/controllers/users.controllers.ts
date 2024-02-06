@@ -1,19 +1,21 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { ErrorResponse } from "~/constants/errorResponse";
-import User from "~/models/schemas/User.schemas";
-import databaseServices from "~/services/database.services";
-import usersServices from "~/services/users.services";
+import { ErrorResponse } from "src/constants/errorResponse"
+import User from "src/models/schemas/User.schemas";
+import databaseServices from "src/services/database.services";
+import usersServices from "src/services/users.services";
 
 export const loginController = async (req: Request, res: Response) => {
   const user_id: ObjectId = req.body.dataUser._id;
 
   try {
-    const [accessToken, refreshToken] = await usersServices.login({ user_id: user_id.toString() });
+    const [accessToken, refreshToken] = await usersServices.login({
+      user_id: user_id.toString(),
+    });
     return res.status(200).json({
       ...req.body.dataUser,
       accessToken,
-      refreshToken
+      refreshToken,
     });
   } catch (err) {
     console.log(err);
@@ -25,7 +27,11 @@ export const loginController = async (req: Request, res: Response) => {
 export const registerController = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
   try {
-    const dataUser: User = await usersServices.register({ email, password, name });
+    const dataUser: User = await usersServices.register({
+      email,
+      password,
+      name,
+    });
     res.status(200).json(dataUser);
   } catch (err) {
     console.log(err);
@@ -39,22 +45,24 @@ export const logoutController = async (req: Request, res: Response) => {
 
     return res.json({
       message: "Success logout",
-      statusCode: 200
+      statusCode: 200,
     });
   } catch (err) {
     console.log(err);
     return res.json(
       new ErrorResponse({
         message: err as string,
-        statusCode: 503
-      })
+        statusCode: 503,
+      }),
     );
   }
 };
 export const emailVerifyValidator = async (req: Request, res: Response) => {
   const { email_verify_token, decode_email_verify_token } = req.body;
   const { user_id } = decode_email_verify_token;
-  const user = await databaseServices.users.findOne({ _id: new ObjectId(user_id) });
+  const user = await databaseServices.users.findOne({
+    _id: new ObjectId(user_id),
+  });
   if (user === null) {
     return res.status(404).json({ message: "User not found" });
   }

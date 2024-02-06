@@ -3,11 +3,12 @@ import dotenv from "dotenv";
 dotenv.config();
 import bodyParser from "body-parser";
 import usersRouter from "./routes/users.routes";
-import datanaseServices from "~/services/database.services";
+
 import storyRouter from "./routes/storys.routes";
 import cors from "cors";
+import databaseServices from "./services/database.services";
 
- datanaseServices.connect();
+databaseServices.connect();
 
 const app = express();
 

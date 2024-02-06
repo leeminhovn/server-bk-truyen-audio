@@ -1,14 +1,14 @@
 import { Collection, Db, MongoClient } from "mongodb";
-import { Chapter } from "~/models/schemas/Chapter.scheme";
-import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
-import { Story } from "~/models/schemas/Story.scheme";
-import User from "~/models/schemas/User.schemas";
+import { Chapter } from "src/models/schemas/Chapter.scheme";
+import { RefreshTokenSchema } from "src/models/schemas/RefreshToken.schema";
+import { Story } from "src/models/schemas/Story.scheme";
+import User from "src/models/schemas/User.schemas";
 
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
   process.env.DB_PASSWORD || "",
 )}@${process.env.DB_IP}:${process.env.DP_PORT}`;
 
-class datanaseServices {
+class dataBaseServices {
   private client: MongoClient;
   private db: Db;
   constructor() {
@@ -42,4 +42,4 @@ class datanaseServices {
   }
 }
 
-export default new datanaseServices();
+export default new dataBaseServices();
