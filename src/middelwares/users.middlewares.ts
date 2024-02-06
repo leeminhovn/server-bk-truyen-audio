@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 
 import { WithId } from "mongodb";
-import { ErrorResponse } from "src/constants/errorResponse";
-import User from "src/models/schemas/User.schemas";
-import { hasPassword } from "src/models/schemas/crypto";
-import databaseServices from "src/services/database.services";
-import { verifyToken } from "src/untils/jwt";
+import { ErrorResponse } from "~/constants/errorResponse";
+import User from "~/models/schemas/User.schemas";
+import { hasPassword } from "~/models/schemas/crypto";
+import databaseServices from "~/services/database.services";
+import { verifyToken } from "~/untils/jwt";
 
 export const loginValidarto = async (
   _req: Request,

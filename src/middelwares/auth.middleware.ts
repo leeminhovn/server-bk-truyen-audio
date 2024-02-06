@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ErrorResponse } from "src/constants/errorResponse";
-import { verifyToken } from "src/untils/jwt";
+import { ErrorResponse } from "~/constants/errorResponse";
+import { verifyToken } from "~/untils/jwt";
 export const authMiddeware = async (
   req: Request,
   res: Response,

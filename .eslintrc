@@ -6,24 +6,26 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "eslint-config-prettier",
-    "prettier"
+    "prettier",
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/prefer-const": "off",
     "prettier/prettier": [
       "warn",
       {
         "arrowParens": "always",
-        "semi": false,
+        "semi": true,
         "trailingComma": "none",
         "tabWidth": 2,
         "endOfLine": "auto",
         "useTabs": false,
-        "singleQuote": true,
+        "singleQuote": false,
         "printWidth": 120,
-        "jsxSingleQuote": true
-      }
-    ]
-  }
+        "jsxSingleQuote": true,
+      },
+    ],
+    "quotes": ["off", "single"],
+  },
 }

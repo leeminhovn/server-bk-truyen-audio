@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { InsertOneResult } from "mongodb";
-import { Story } from "src/models/schemas/Story.scheme";
-import storysServices from "src/services/storys.services";
+import { Story } from "~/models/schemas/Story.scheme";
+import storysServices from "~/services/storys.services";
 
 export const uploadStoryController = async (req: Request, res: Response) => {
   try {

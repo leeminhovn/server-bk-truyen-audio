@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { ErrorResponse } from "src/constants/errorResponse"
-import User from "src/models/schemas/User.schemas";
-import databaseServices from "src/services/database.services";
-import usersServices from "src/services/users.services";
+import { ErrorResponse } from "~/constants/errorResponse";
+import User from "~/models/schemas/User.schemas";
+import databaseServices from "~/services/database.services";
+import usersServices from "~/services/users.services";
 
 export const loginController = async (req: Request, res: Response) => {
   const user_id: ObjectId = req.body.dataUser._id;
