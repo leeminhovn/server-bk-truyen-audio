@@ -31,6 +31,7 @@ class userService {
       },
     });
   }
+  
   private signEmailVerifyToken(user_id: string) {
     return signJwt({
       payload: {

@@ -29,3 +29,19 @@ export const uploadStoryController = async (req: Request, res: Response) => {
     res.status(400).json(err);
   }
 };
+
+export const getAllStoryListController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { page = 0, limit = 20 } = req.body;
+
+  try {
+    const data_storys: Array<Story> = await storysServices.getListAllStory();
+
+    return res.json(data_storys.splice(page * limit, limit));
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+};

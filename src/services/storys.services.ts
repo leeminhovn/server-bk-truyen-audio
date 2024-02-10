@@ -24,6 +24,7 @@ class storyServices {
     }
     return true;
   }
+
   async uploadStory(story_info: Story, chapters: Array<Chapter>) {
     const result = await databaseServices.storys.insertOne(story_info);
     const dataChapters = chapters.map((chapter) => {
@@ -36,6 +37,14 @@ class storyServices {
       1000,
     );
 
+    return result;
+  }
+  async getListAllStory() {
+    const result: Array<Story> = await databaseServices.storys
+      .find()
+      .sort({ created_at: -1 })
+      .toArray();
+    console.log(result);
     return result;
   }
 }

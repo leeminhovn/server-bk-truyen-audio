@@ -3,21 +3,26 @@ import { Chapter } from "~/models/schemas/Chapter.scheme";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { Story } from "~/models/schemas/Story.scheme";
 import User from "~/models/schemas/User.schemas";
-
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
   process.env.DB_PASSWORD || "",
-)}@${process.env.DB_IP}:${process.env.DP_PORT}`;
+)}@${process.env.DB_IP}:${process.env.DB_PORT}`;
 
 class dataBaseServices {
   private client: MongoClient;
-  private db: Db;
+  private db_storys: Db;
+  private db_users: Db;
+
   constructor() {
     this.client = new MongoClient(uri);
-    this.db = this.client.db(process.env.DB_NAME);
+    this.db_storys = this.client.db(process.env.DB_STORYS_NAME);
+    this.db_users = this.client.db(process.env.users);
   }
   async connect() {
     try {
-      await this.db.command({ ping: 1 });
+      await Promise.all([
+        this.db_storys.command({ ping: 1 }),
+        this.db_users.command({ ping: 1 }),
+      ]);
       console.log(
         "Pinged your deployment. You successfully connected to MongoDB kaka!",
       );
@@ -28,17 +33,22 @@ class dataBaseServices {
     }
   }
   get users(): Collection<User> {
-    return this.db.collection(process.env.DB_USERS_COLLECTION || "");
+    return this.db_storys.collection(process.env.DB_USERS_COLLECTION || "");
   }
-
+  get followersStory (): Collection<> {
+    
+    return this.db_users.collection(process.env.DB_FOLLOWERS_STORYS || "");
+  }
   get refreshTokens(): Collection<RefreshTokenSchema> {
-    return this.db.collection(process.env.DB_REFRESHTOKENS_COLLECTION || "");
+    return this.db_storys.collection(
+      process.env.DB_REFRESHTOKENS_COLLECTION || "",
+    );
   }
   get storys(): Collection<Story> {
-    return this.db.collection(process.env.DB_STORYS_COLLECTION || "");
+    return this.db_storys.collection(process.env.DB_STORYS_COLLECTION || "");
   }
   get chapters(): Collection<Chapter> {
-    return this.db.collection(process.env.DB_CHAPTERS_COLLECTION || "");
+    return this.db_storys.collection(process.env.DB_CHAPTERS_COLLECTION || "");
   }
 }
 
