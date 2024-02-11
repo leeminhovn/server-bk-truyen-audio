@@ -1,32 +1,6 @@
 import { ObjectId } from "mongodb";
 import { UserVerifyStatus } from "~/constants/enum";
-
-export const UserLevelIndex: Array<String> = [
-  "Luyện khí",
-  "Trúc cơ",
-  "Kim đan",
-  "Nguyên anh",
-  "Hóa thần",
-  "Độ kiếp",
-  "Luyện hư",
-  "Hợp thể",
-  "Đại thừa",
-  "Phi thăng",
-  "Ngụy tiên",
-  "Tán tiên",
-  "Huyền tiên",
-  "Địa tiên",
-  "Chân tiên",
-  "Kim tiên",
-  "Thái ất kim tiên",
-  "Đại la kim tiên",
-  "Chuẩn thánh",
-  "Thánh nhân",
-  "Bán bộ đại thánh",
-  "Đại thánh",
-  "Chuẩn đế",
-  "Đại đế",
-];
+import { UserAreaIndex, UserLevelIndex } from "~/constants/user";
 
 interface UserType {
   _id?: ObjectId;
@@ -42,7 +16,9 @@ interface UserType {
   accessToken: string;
   refreshToken: string;
   level: String;
+  area: String;
 }
+
 class User {
   _id?: ObjectId;
   name: string;
@@ -57,6 +33,7 @@ class User {
   refreshToken: string;
   spirit_stone: Number;
   level: String;
+  area: String;
 
   constructor(user: UserType) {
     const dateNow = new Date();
@@ -73,6 +50,7 @@ class User {
     this.spirit_stone = user.spirit_stone || 0;
     this.refreshToken = user.refreshToken;
     this.level = user.level || UserLevelIndex[0];
+    this.area = user.area || UserAreaIndex[0];
   }
 }
 export default User;
