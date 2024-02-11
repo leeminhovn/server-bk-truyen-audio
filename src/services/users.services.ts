@@ -2,9 +2,10 @@ import { signJwt } from "~/untils/jwt";
 import databaseServices from "./database.services";
 import User from "~/models/schemas/User.schemas";
 import { TokenType, UserVerifyStatus } from "~/constants/enum";
-import { hasPassword } from "~/models/schemas/crypto";
+import { hasPassword } from "~/untils/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { ObjectId } from "mongodb";
+
 class userService {
   private signAccessToken(user_id: string): Promise<string> {
     return signJwt({
@@ -31,7 +32,7 @@ class userService {
       },
     });
   }
-  
+
   private signEmailVerifyToken(user_id: string) {
     return signJwt({
       payload: {

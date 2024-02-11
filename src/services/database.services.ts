@@ -1,5 +1,6 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { Chapter } from "~/models/schemas/Chapter.scheme";
+import { FollowersStory } from "~/models/schemas/FollowersStory.scheme";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { Story } from "~/models/schemas/Story.scheme";
 import User from "~/models/schemas/User.schemas";
@@ -35,8 +36,7 @@ class dataBaseServices {
   get users(): Collection<User> {
     return this.db_storys.collection(process.env.DB_USERS_COLLECTION || "");
   }
-  get followersStory (): Collection<> {
-    
+  get followersStory(): Collection<FollowersStory> {
     return this.db_users.collection(process.env.DB_FOLLOWERS_STORYS || "");
   }
   get refreshTokens(): Collection<RefreshTokenSchema> {
