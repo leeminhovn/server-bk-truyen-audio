@@ -11,7 +11,7 @@ interface StoryType {
   created_at?: Date;
   updated_at?: Date;
   completed_status: StoryCompletedStatus;
-  count_followers_story: Number;
+  count_followers_story?: Number;
 }
 export class Story extends BaseSchema {
   _id?: ObjectId;
@@ -31,6 +31,6 @@ export class Story extends BaseSchema {
     this.story_quick_review = story.story_quick_review;
     this.story_genre = story.story_genre;
     this.completed_status = story.completed_status;
-    this.count_followers_story = story.count_followers_story;
+    this.count_followers_story = story.count_followers_story || 0;
   }
 }

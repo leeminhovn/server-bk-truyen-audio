@@ -12,11 +12,11 @@ interface UserType {
   updated_at?: Date;
   verify?: UserVerifyStatus;
   email_verify_token?: string;
-  spirit_stone: Number;
   accessToken: string;
   refreshToken: string;
-  level: String;
-  area: String;
+  spirit_stone?: Number;
+  level?: String;
+  area?: String;
 }
 
 class User {
@@ -47,8 +47,8 @@ class User {
     this.verify = user.verify || UserVerifyStatus.UnVerified;
     this.accessToken = user.accessToken;
     this.email_verify_token = user.email_verify_token || "";
-    this.spirit_stone = user.spirit_stone || 0;
     this.refreshToken = user.refreshToken;
+    this.spirit_stone = user.spirit_stone || 0;
     this.level = user.level || UserLevelIndex[0];
     this.area = user.area || UserAreaIndex[0];
   }
