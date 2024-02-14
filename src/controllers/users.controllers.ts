@@ -38,6 +38,7 @@ export const registerController = async (req: Request, res: Response) => {
     res.status(400).json({ message: "fail register" });
   }
 };
+
 export const logoutController = async (req: Request, res: Response) => {
   const { user_id, refreshToken } = req.body;
   try {
@@ -57,6 +58,7 @@ export const logoutController = async (req: Request, res: Response) => {
     );
   }
 };
+
 export const emailVerifyValidator = async (req: Request, res: Response) => {
   const { email_verify_token, decode_email_verify_token } = req.body;
   const { user_id } = decode_email_verify_token;
