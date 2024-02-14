@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { ErrorResponse } from "~/constants/errorResponse";
-import User from "~/models/schemas/User.schemas";
-
+import Admin from "~/models/schemas/Admin.schemas";
 import adminServices from "~/services/admin.services";
+
 
 export const adminLoginController = async (req: Request, res: Response) => {
   const user_id: ObjectId = req.body.dataUser._id;
@@ -27,7 +27,7 @@ export const adminLoginController = async (req: Request, res: Response) => {
 export const adminRegisterController = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
   try {
-    const dataUser: User = await adminServices.register({
+    const dataUser: Admin = await adminServices.register({
       email,
       password,
       name,

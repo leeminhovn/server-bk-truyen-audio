@@ -108,7 +108,6 @@ export const logoutValidate = async (
     );
   }
 };
-
 export const emailVerifyMiddleWare = async (
   req: Request,
   res: Response,

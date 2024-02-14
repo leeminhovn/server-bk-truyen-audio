@@ -1,6 +1,6 @@
 import { signJwt } from "~/untils/jwt";
 import databaseServices from "./database.services";
-import { TokenType, UserVerifyStatus } from "~/constants/enum";
+import { TokenType } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { ObjectId } from "mongodb";
