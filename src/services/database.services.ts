@@ -5,21 +5,25 @@ import { FollowersStory } from "~/models/schemas/FollowersStory.scheme";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { Story } from "~/models/schemas/Story.scheme";
 import User from "~/models/schemas/User.schemas";
+
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
   process.env.DB_PASSWORD || "",
 )}@${process.env.DB_IP}:${process.env.DB_PORT}`;
 
 class dataBaseServices {
+  
   private client: MongoClient;
   private db_storys: Db;
   private db_users: Db;
   private db_admin: Db;
+
   constructor() {
     this.client = new MongoClient(uri);
     this.db_storys = this.client.db(process.env.DB_STORYS_NAME);
     this.db_users = this.client.db(process.env.DB_USERS_NAME);
     this.db_admin = this.client.db(process.env.DB_ADMIN_NAME);
   }
+
   async connect() {
     try {
       await Promise.all([
@@ -47,11 +51,13 @@ class dataBaseServices {
   get followersStory(): Collection<FollowersStory> {
     return this.db_users.collection(process.env.DB_FOLLOWERS_STORYS || "");
   }
+
   get refreshTokens(): Collection<RefreshTokenSchema> {
-    return this.db_storys.collection(
+    return this.db_users.collection(
       process.env.DB_REFRESHTOKENS_COLLECTION || "",
     );
   }
+
   get storys(): Collection<Story> {
     return this.db_storys.collection(process.env.DB_STORYS_COLLECTION || "");
   }
