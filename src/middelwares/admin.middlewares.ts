@@ -73,6 +73,7 @@ export const adminRegisterValidate = async (
     }
   }
 };
+
 export const adminLogoutValidate = async (
   req: Request,
   res: Response,
