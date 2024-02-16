@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
 import { WithId } from "mongodb";
-import { ErrorResponse } from "~/constants/errorResponse";
 import User from "~/models/schemas/User.schemas";
 import { hasPassword } from "~/untils/crypto";
 import databaseServices from "~/services/database.services";
@@ -14,9 +13,7 @@ export const loginValidator = async (
 ) => {
   const { password = "", email = "" } = _req.body;
   if (password.length === 0 || email.length === 0) {
-    return res.json(
-      new ErrorResponse({ message: "Error your data send", statusCode: 400 }),
-    );
+    return res.status(400).json({ message: "Error your data send" });
   }
   const accountCheck: WithId<User> | null =
     await databaseServices.users.findOne({ email: email });
@@ -41,9 +38,7 @@ export const registerValidate = async (
   const { email = "", password = "" } = req.body;
   switch (true) {
     case password.length === 0 || email.length === 0:
-      return res.json(
-        new ErrorResponse({ message: "Error your data send", statusCode: 400 }),
-      );
+      return res.status(400).json({ message: "Error your data send" });
 
     case password.length === 0:
       return res.status(400).json({ error: "type your password" });
@@ -67,12 +62,10 @@ export const registerValidate = async (
       if (accountCheck === null) {
         return next();
       }
-      return res.json(
-        new ErrorResponse({
-          message: "This account already exists",
-          statusCode: 409,
-        }),
-      );
+      return res.json({
+        message: "This account already exists",
+        statusCode: 409,
+      });
     }
   }
 };
@@ -83,12 +76,10 @@ export const logoutValidate = async (
   next: NextFunction,
 ) => {
   if (!req.body.refreshToken) {
-    return res.json(
-      new ErrorResponse({
-        message: "Invalid refreshToken",
-        statusCode: 401,
-      }),
-    );
+    return res.json({
+      message: "Invalid refreshToken",
+      statusCode: 401,
+    });
   }
 
   try {
@@ -100,12 +91,10 @@ export const logoutValidate = async (
 
     next();
   } catch (err) {
-    return res.json(
-      new ErrorResponse({
-        message: "Error verify refreshToken",
-        statusCode: 401,
-      }),
-    );
+    return res.json({
+      message: "Error verify refreshToken",
+      statusCode: 401,
+    });
   }
 };
 export const emailVerifyMiddleWare = async (
@@ -114,12 +103,10 @@ export const emailVerifyMiddleWare = async (
   next: NextFunction,
 ) => {
   if (!req.body?.email_verify_token) {
-    return res.json(
-      new ErrorResponse({
-        message: "EmailVerifyToken is Reqired",
-        statusCode: 401,
-      }),
-    );
+    return res.json({
+      message: "EmailVerifyToken is Reqired",
+      statusCode: 401,
+    });
   }
 
   try {
@@ -132,11 +119,9 @@ export const emailVerifyMiddleWare = async (
     return next();
   } catch (err) {
     console.log(err);
-    res.json(
-      new ErrorResponse({
-        message: "Invalid email_verify_token",
-        statusCode: 401,
-      }),
-    );
+    res.json({
+      message: "Invalid email_verify_token",
+      statusCode: 401,
+    });
   }
 };

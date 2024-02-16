@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { WithId } from "mongodb";
-import { ErrorResponse } from "~/constants/errorResponse";
 import Admin from "~/models/schemas/Admin.schemas";
 import databaseServices from "~/services/database.services";
 import { hasPassword } from "~/untils/crypto";
@@ -13,9 +12,7 @@ export const adminLoginValidator = async (
 ) => {
   const { password = "", email = "" } = _req.body;
   if (!password.length || !email.length) {
-    return res.json(
-      new ErrorResponse({ message: "Error your data send", statusCode: 400 }),
-    );
+    return res.status(400).json({ error: "Error your data send" });
   }
   const accountCheck: WithId<Admin> | null =
     await databaseServices.adminAccounts.findOne({ email: email });
@@ -38,9 +35,7 @@ export const adminRegisterValidate = async (
   const { email = "", password = "" } = req.body;
   switch (true) {
     case password.length === 0 || email.length === 0:
-      return res.json(
-        new ErrorResponse({ message: "Error your data send", statusCode: 400 }),
-      );
+      return res.status(400).json({ error: "Error your data send" });
 
     case password.length === 0:
       return res.status(400).json({ error: "type your password" });
@@ -64,12 +59,9 @@ export const adminRegisterValidate = async (
       if (accountCheck === null) {
         return next();
       }
-      return res.json(
-        new ErrorResponse({
-          message: "This account already exists",
-          statusCode: 409,
-        }),
-      );
+      return res.status(409).json({
+        error: "This account already exists",
+      });
     }
   }
 };
@@ -80,12 +72,9 @@ export const adminLogoutValidate = async (
   next: NextFunction,
 ) => {
   if (!req.body.refreshToken) {
-    return res.json(
-      new ErrorResponse({
-        message: "Invalid refreshToken",
-        statusCode: 401,
-      }),
-    );
+    return res.status(401).json({
+      error: "Invalid refreshToken",
+    });
   }
   try {
     const decode = await verifyToken(
@@ -95,11 +84,8 @@ export const adminLogoutValidate = async (
     req.body.user_id = decode.user_id;
     next();
   } catch (err) {
-    return res.json(
-      new ErrorResponse({
-        message: "Error verify refreshToken",
-        statusCode: 401,
-      }),
-    );
+    return res.status(401).json({
+      error: "Error verify refreshToken",
+    });
   }
 };

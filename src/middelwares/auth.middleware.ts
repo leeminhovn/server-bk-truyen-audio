@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { ErrorResponse } from "~/constants/errorResponse";
 import { verifyToken } from "~/untils/jwt";
 export const authMiddeware = async (
   req: Request,
@@ -9,12 +8,9 @@ export const authMiddeware = async (
   const authorizationHeader = req.header("Authorization");
 
   if (!authorizationHeader) {
-    return res.json(
-      new ErrorResponse({
-        message: "Authorization header is missing",
-        statusCode: 400,
-      }),
-    );
+    return res.status(400).json({
+      message: "Authorization header is missing",
+    });
   }
   try {
     const decode = await verifyToken(
@@ -24,8 +20,6 @@ export const authMiddeware = async (
     next();
   } catch (err) {
     console.log(err);
-    res.json(
-      new ErrorResponse({ message: "invalid accessToken", statusCode: 401 }),
-    );
+    res.status(401).json({ message: "invalid accessToken" });
   }
 };

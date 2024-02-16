@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { ErrorResponse } from "~/constants/errorResponse";
 import Admin from "~/models/schemas/Admin.schemas";
 import adminServices from "~/services/admin.services";
-
 
 export const adminLoginController = async (req: Request, res: Response) => {
   const user_id: ObjectId = req.body.dataUser._id;
@@ -44,17 +42,13 @@ export const adminLogoutController = async (req: Request, res: Response) => {
   try {
     const result = await adminServices.logout({ user_id: user_id });
 
-    return res.json({
+    return res.status(200).json({
       message: "Success logout",
-      statusCode: 200,
     });
   } catch (err) {
     console.log(err);
-    return res.json(
-      new ErrorResponse({
-        message: err as string,
-        statusCode: 503,
-      }),
-    );
+    return res.status(503).json({
+      message: err as string,
+    });
   }
 };
