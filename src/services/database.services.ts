@@ -11,7 +11,6 @@ const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
 )}@${process.env.DB_IP}:${process.env.DB_PORT}`;
 
 class dataBaseServices {
-  
   private client: MongoClient;
   private db_storys: Db;
   private db_users: Db;

@@ -3,7 +3,7 @@ import databaseServices from "./database.services";
 import { TokenType } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/Admin.schemas";
 
 class adminServices {
@@ -95,6 +95,14 @@ class adminServices {
           reject(err);
         });
     });
+  }
+  async getAdminInfo(payload: { user_id: string }) {
+    const accountFound: WithId<Admin> | null =
+      await databaseServices.adminAccounts.findOne({
+        user_id: payload.user_id,
+      });
+
+    return accountFound;
   }
 }
 export default new adminServices();

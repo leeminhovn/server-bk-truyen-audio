@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/Admin.schemas";
 import adminServices from "~/services/admin.services";
+import { verifyToken } from "~/untils/jwt";
 
 export const adminLoginController = async (req: Request, res: Response) => {
   const user_id: ObjectId = req.body.dataUser._id;
@@ -51,4 +52,20 @@ export const adminLogoutController = async (req: Request, res: Response) => {
       message: err as string,
     });
   }
+};
+export const adminGetAdminInfo = async (req: Request, res: Response) => {
+  const authorizationHeader = req.header("Authorization") || "";
+  const decode = await verifyToken(
+    authorizationHeader.split(" ")[1],
+    process.env.PRIVATE_KEY_JWT,
+  );
+  const accountFound: WithId<Admin> | null = await adminServices.getAdminInfo(
+    decode.user_id,
+  );
+  if (accountFound !== null) {
+    return res.status(200).json(accountFound);
+  }
+  return res.status(400).json({
+    error: "Account does not exist",
+  });
 };

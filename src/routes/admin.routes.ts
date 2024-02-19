@@ -4,12 +4,14 @@ import {
   adminLoginController,
   adminRegisterController,
   adminLogoutController,
+  adminGetAdminInfo,
 } from "~/controllers/admin.controllers";
 import {
   adminLoginValidator,
   adminLogoutValidate,
   adminRegisterValidate,
 } from "~/middelwares/admin.middlewares";
+import { authMiddeware } from "~/middelwares/auth.middleware";
 
 const adminRouter = Router();
 

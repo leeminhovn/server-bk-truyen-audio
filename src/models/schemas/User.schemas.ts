@@ -38,7 +38,7 @@ class User {
   constructor(user: UserType) {
     const dateNow = new Date();
     this._id = user._id;
-    this.name = user.name;
+    this.name = user.name || "";
     this.email = user.email;
     this.date_of_birth = user.date_of_birth || dateNow;
     this.password = user.password;

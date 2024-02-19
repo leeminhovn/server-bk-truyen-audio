@@ -1,7 +1,7 @@
 import { Story } from "~/models/schemas/Story.scheme";
 import databaseServices from "./database.services";
 import { Chapter } from "~/models/schemas/Chapter.scheme";
-import { Collection } from "mongodb";
+import { Collection, Filter } from "mongodb";
 
 class storyServices {
   constructor() {}
@@ -39,13 +39,21 @@ class storyServices {
 
     return result;
   }
-  async getListAllStory() {
+  async getListAllStory(skip: number, limit: number, search: string) {
+    const searchQuery =
+      search.length > 0
+        ? { story_name: { $regex: search.trim(), $options: "i" } }
+        : {};
+
     const result: Array<Story> = await databaseServices.storys
-      .find()
+      .find(searchQuery as Filter<Story>)
       .sort({ created_at: -1 })
+      .limit(limit)
+      .skip(skip)
       .toArray();
-    console.log(result);
+
     return result;
   }
 }
+
 export default new storyServices();

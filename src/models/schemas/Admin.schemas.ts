@@ -9,7 +9,6 @@ interface AdminType {
   updated_at?: Date;
   accessToken: string;
   refreshToken: string;
-
 }
 
 class Admin {
@@ -25,7 +24,7 @@ class Admin {
   constructor(user: AdminType) {
     const dateNow = new Date();
     this._id = user._id;
-    this.name = user.name;
+    this.name = user.name || "";
     this.email = user.email;
     this.password = user.password;
     this.created_at = user.created_at || dateNow;

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { InsertOneResult } from "mongodb";
+import { skip } from "node:test";
 import { Story } from "~/models/schemas/Story.scheme";
 import storysServices from "~/services/storys.services";
 
@@ -34,12 +35,19 @@ export const getAllStoryListController = async (
   req: Request,
   res: Response,
 ) => {
-  const { page = 0, limit = 20 } = req.body;
-
+  const page: number = Number(req.query.page) || 0;
+  const limit: number = Number(req.query.limit) || 20;
+  const search: string =
+    req.query?.search !== undefined ? req.query?.search.toString() : "";
+  console.log(search);
   try {
-    const data_storys: Array<Story> = await storysServices.getListAllStory();
+    const data_storys: Array<Story> = await storysServices.getListAllStory(
+      page,
+      limit,
+      search,
+    );
 
-    return res.json(data_storys.splice(page * limit, limit));
+    return res.json(data_storys);
   } catch (err) {
     console.log(err);
     res.status(400).json(err);
