@@ -2,6 +2,7 @@ import { Story } from "~/models/schemas/Story.scheme";
 import databaseServices from "./database.services";
 import { Chapter } from "~/models/schemas/Chapter.scheme";
 import { Collection, Filter } from "mongodb";
+import { ObjectId } from "mongodb";
 
 class storyServices {
   constructor() {}
@@ -39,6 +40,7 @@ class storyServices {
 
     return result;
   }
+
   async getListAllStory(skip: number, limit: number, search: string) {
     const searchQuery =
       search.length > 0
@@ -53,6 +55,16 @@ class storyServices {
       .toArray();
 
     return result;
+  }
+  async getStoryInfo(story_id: string) {
+    const story_id_object = new ObjectId(story_id);
+
+    const [story, chapters] = await Promise.all([
+      databaseServices.storys.findOne({ _id: story_id_object }),
+      databaseServices.chapters.find({ story_id: story_id_object }),
+    ]);
+
+    console.log(story, chapters);
   }
 }
 

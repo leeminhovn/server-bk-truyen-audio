@@ -39,7 +39,7 @@ export const getAllStoryListController = async (
   const limit: number = Number(req.query.limit) || 20;
   const search: string =
     req.query?.search !== undefined ? req.query?.search.toString() : "";
-  console.log(search);
+
   try {
     const data_storys: Array<Story> = await storysServices.getListAllStory(
       page,
@@ -51,5 +51,12 @@ export const getAllStoryListController = async (
   } catch (err) {
     console.log(err);
     res.status(400).json(err);
+  }
+};
+export const getInfoStory = async (req: Request, res: Response) => {
+  const { story_id } = req.query;
+  if (story_id) {
+  } else {
+    res.status(404).json({ message: "Not found story" });
   }
 };
