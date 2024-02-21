@@ -56,15 +56,25 @@ class storyServices {
 
     return result;
   }
+
   async getStoryInfo(story_id: string) {
     const story_id_object = new ObjectId(story_id);
 
-    const [story, chapters] = await Promise.all([
-      databaseServices.storys.findOne({ _id: story_id_object }),
-      databaseServices.chapters.find({ story_id: story_id_object }),
-    ]);
-
-    console.log(story, chapters);
+    try {
+      const [story, chapters] = await Promise.all([
+        databaseServices.storys.findOne({ _id: story_id_object }),
+        databaseServices.chapters
+          .find({ story_id: story_id_object })
+          .project({ chapter_name: 1, _id: 1 })
+          .toArray(),
+      ]);
+      // tìm hiểu về tính năng trỏ index mông, nodejs super, để tối ưu logic tìm chapter
+      console.log(chapters);
+      return [story, chapters];
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
   }
 }
 

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { InsertOneResult } from "mongodb";
-import { skip } from "node:test";
 import { Story } from "~/models/schemas/Story.scheme";
 import storysServices from "~/services/storys.services";
 
@@ -53,9 +52,14 @@ export const getAllStoryListController = async (
     res.status(400).json(err);
   }
 };
-export const getInfoStory = async (req: Request, res: Response) => {
+
+export const getStoryInfoContoller = async (req: Request, res: Response) => {
   const { story_id } = req.query;
+
   if (story_id) {
+    const infoStory = await storysServices.getStoryInfo(story_id.toString());
+
+    res.status(200).json({ story: infoStory[0], chapters: infoStory[1] });
   } else {
     res.status(404).json({ message: "Not found story" });
   }
