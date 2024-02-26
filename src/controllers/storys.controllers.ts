@@ -55,7 +55,6 @@ export const getAllStoryListController = async (
 
 export const getStoryInfoContoller = async (req: Request, res: Response) => {
   const { story_id } = req.query;
-
   if (story_id) {
     const infoStory = await storysServices.getStoryInfo(story_id.toString());
 
@@ -63,4 +62,17 @@ export const getStoryInfoContoller = async (req: Request, res: Response) => {
   } else {
     res.status(404).json({ message: "Not found story" });
   }
+};
+export const adminStoryUpdateInfoStoryController = async (
+  req: Request,
+  res: Response,
+) => {
+  const storyInfoUpdate = req.body.storyInfoUpdate;
+
+  const statusUpdate =
+    await storysServices.adminStoryInfoUpdate(storyInfoUpdate);
+  if (statusUpdate) {
+    return res.status(200).json({ message: "success" });
+  }
+  return res.status(404).json({ message: "Not found story id to update" });
 };

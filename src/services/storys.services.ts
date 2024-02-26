@@ -42,13 +42,10 @@ class storyServices {
   }
 
   async getListAllStory(skip: number, limit: number, search: string) {
-    const searchQuery =
-      search.length > 0
-        ? { story_name: { $regex: search.trim(), $options: "i" } }
-        : {};
+    const searchQuery = search.length > 0 ? { $text: { $search: search } } : {};
 
     const result: Array<Story> = await databaseServices.storys
-      .find(searchQuery as Filter<Story>)
+      .find(searchQuery)
       .sort({ created_at: -1 })
       .limit(limit)
       .skip(skip)
@@ -68,12 +65,30 @@ class storyServices {
           .project({ chapter_name: 1, _id: 1 })
           .toArray(),
       ]);
-      // tìm hiểu về tính năng trỏ index mông, nodejs super, để tối ưu logic tìm chapter
+
       console.log(chapters);
       return [story, chapters];
     } catch (err) {
       console.log(err);
       return [];
+    }
+  }
+
+  async adminStoryInfoUpdate(newUpdateStory: any): Promise<boolean> {
+    try {
+      const newStoryDeleteId = new Story(newUpdateStory);
+      delete newStoryDeleteId._id;
+      delete newStoryDeleteId.updated_at;
+
+      const result = await databaseServices.storys.findOneAndUpdate(
+        { _id: new ObjectId(newUpdateStory._id) },
+        { $set: newStoryDeleteId, $currentDate: { updated_at: true } },
+      );
+      console.log(result);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
     }
   }
 }

@@ -6,6 +6,8 @@ interface ChapterType {
   story_id: ObjectId;
   chapter_name: String;
   content_chapter: String;
+  created_at?: Date;
+  updated_at?: Date;
 }
 export class Chapter extends BaseSchema {
   _id?: ObjectId;
@@ -14,7 +16,7 @@ export class Chapter extends BaseSchema {
   content_chapter: String;
 
   constructor(chapter: ChapterType) {
-    super();
+    super(chapter.created_at, chapter.updated_at);
     this._id = chapter._id;
     (this.chapter_name = chapter.chapter_name),
       (this.content_chapter = chapter.content_chapter);

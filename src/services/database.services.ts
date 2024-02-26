@@ -40,7 +40,9 @@ class dataBaseServices {
     }
   }
   get users(): Collection<User> {
-    return this.db_storys.collection(process.env.DB_USERS_COLLECTION || "");
+    return this.db_users.collection(
+      process.env.DB_USERS_ACCOUNTS_COLLECTION || "",
+    );
   }
   get adminAccounts(): Collection<Admin> {
     return this.db_admin.collection(

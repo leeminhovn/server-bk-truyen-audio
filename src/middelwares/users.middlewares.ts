@@ -5,6 +5,7 @@ import User from "~/models/schemas/User.schemas";
 import { hasPassword } from "~/untils/crypto";
 import databaseServices from "~/services/database.services";
 import { verifyToken } from "~/untils/jwt";
+import usersServices from "~/services/users.services";
 
 export const loginValidator = async (
   _req: Request,
@@ -124,4 +125,20 @@ export const emailVerifyMiddleWare = async (
       statusCode: 401,
     });
   }
+};
+export const nameIsDuplicateMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const isDuplicate: boolean = await usersServices.checkNameIsDuplicate(
+    req.body.name,
+  );
+
+  if (isDuplicate) {
+    return res.status(400).json({ message: "Name already exists" });
+  } else {
+    next();
+  }
+  // return;
 };

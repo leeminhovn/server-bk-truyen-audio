@@ -5,6 +5,7 @@ import { hasPassword } from "~/untils/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
 import { ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/Admin.schemas";
+import User from "~/models/schemas/User.schemas";
 
 class adminServices {
   private signAccessToken(user_id: string): Promise<string> {
@@ -103,6 +104,30 @@ class adminServices {
       });
 
     return accountFound;
+  }
+  async refreshToken(user_id: string): Promise<string | null> {
+    const result: WithId<RefreshTokenSchema> | null =
+      await databaseServices.refreshTokens.findOne({
+        user_id: new ObjectId(user_id),
+      });
+    if (result !== null) {
+      return await this.signAccessToken(user_id);
+    } else {
+      return null;
+    }
+  }
+  async getListAllUser(skip: number, limit: number, search: string) {
+    const searchQuery = search.length > 0 ? { $text: { $search: search } } : {};
+
+    const result = await databaseServices.users
+      .find(searchQuery)
+      .sort({ created_at: -1 })
+      .project({ level: 1, email: 1, spirit_stone: 1, area: 1, name: 1 })
+      .limit(limit)
+      .skip(skip)
+      .toArray();
+
+    return result;
   }
 }
 export default new adminServices();

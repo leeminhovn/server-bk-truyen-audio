@@ -4,7 +4,7 @@ import User from "~/models/schemas/User.schemas";
 import { TokenType, UserVerifyStatus } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 
 class userService {
   private signAccessToken(user_id: string): Promise<string> {
@@ -130,6 +130,11 @@ class userService {
     return {
       message: "Email verify success",
     };
+  }
+  async checkNameIsDuplicate(name_user: string): Promise<boolean> {
+    const resultFindName: WithId<User> | null =
+      await databaseServices.users.findOne({ name: name_user });
+    return resultFindName !== null;
   }
 }
 export default new userService();

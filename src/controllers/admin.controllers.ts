@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/Admin.schemas";
+import User from "~/models/schemas/User.schemas";
 import adminServices from "~/services/admin.services";
 import { verifyToken } from "~/untils/jwt";
 
@@ -68,4 +69,41 @@ export const adminGetAdminInfo = async (req: Request, res: Response) => {
   return res.status(400).json({
     error: "Account does not exist",
   });
+};
+export const adminGetRefreshTokenController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const decode = await verifyToken(
+      req.body.refreshToken,
+      process.env.PRIVATE_KEY_JWT,
+    );
+    const resultFindRefreshToken = await adminServices.refreshToken(
+      decode.user_id,
+    );
+    if (resultFindRefreshToken !== null) {
+      return res.status(200).json({ accessToken: resultFindRefreshToken });
+    } else {
+      return res.status(404).json({ message: "Not found token" });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(404).json({ message: "Token invalid" });
+  }
+};
+export const adminGetAllListUser = async (req: Request, res: Response) => {
+  const page: number = Number(req.query.page) || 0;
+  const limit: number = Number(req.query.limit) || 20;
+  const search: string =
+    req.query?.search !== undefined ? req.query?.search.toString() : "";
+
+  try {
+    const data_storys = await adminServices.getListAllUser(page, limit, search);
+
+    return res.json(data_storys);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
 };
