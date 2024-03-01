@@ -107,3 +107,10 @@ export const adminGetAllListUser = async (req: Request, res: Response) => {
     res.status(400).json(err);
   }
 };
+export const adminGetAndUpdateAllStoriesController = async (
+  req: Request,
+  res: Response,
+) => {
+  const resultFetch = await fetch("https://truyenfull.vn/tim-kiem/?tukhoa=%22");
+  return res.status(200).send(await resultFetch.text());
+};
