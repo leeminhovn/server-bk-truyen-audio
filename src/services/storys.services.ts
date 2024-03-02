@@ -67,7 +67,6 @@ class storyServices {
     }
 
     if (resultFindDuplicatedStory !== null) {
-      console.log("delete");
       await this.deleteStory(resultFindDuplicatedStory._id.toString());
     }
     const resultStoryInsert: InsertOneResult<Story> =
@@ -112,7 +111,6 @@ class storyServices {
           .toArray(),
       ]);
 
-      console.log(chapters);
       return [story, chapters];
     } catch (err) {
       console.log(err);
@@ -130,7 +128,6 @@ class storyServices {
         { _id: new ObjectId(newUpdateStory._id) },
         { $set: newStoryDeleteId, $currentDate: { updated_at: true } },
       );
-      console.log(result);
       return true;
     } catch (err) {
       console.log(err);
