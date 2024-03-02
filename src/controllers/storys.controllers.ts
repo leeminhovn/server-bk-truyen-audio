@@ -11,18 +11,22 @@ export const uploadStoryController = async (req: Request, res: Response) => {
       story_quick_review,
       completed_status,
       chapters,
+      story_picture,
       story_genre,
     } = req.body;
-    const data_story: InsertOneResult<Story> = await storysServices.uploadStory(
-      new Story({
-        story_name,
-        auhtor_name,
-        story_quick_review,
-        completed_status,
-        story_genre,
-      }),
-      chapters,
-    );
+    const data_story: InsertOneResult<Story> | null =
+      await storysServices.uploadStory(
+        new Story({
+          story_name,
+          auhtor_name,
+          story_quick_review,
+          completed_status,
+          story_picture,
+          story_genre,
+          count_chapters: chapters.length,
+        }),
+        chapters,
+      );
     res.status(200).json({ message: "success insert story" });
   } catch (err) {
     console.log(err);
@@ -75,4 +79,13 @@ export const adminStoryUpdateInfoStoryController = async (
     return res.status(200).json({ message: "success" });
   }
   return res.status(404).json({ message: "Not found story id to update" });
+};
+export const handlePrepareUpdateStoryControler = async (
+  req: Request,
+  res: Response,
+) => {
+  const story_info: Story = req.body;
+  const statusAcceptUpdate: boolean =
+    await storysServices.handlePrepareStoryNeedUpdate(story_info);
+  return res.status(200).json({ message: statusAcceptUpdate });
 };

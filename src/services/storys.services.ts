@@ -1,8 +1,9 @@
 import { Story } from "~/models/schemas/Story.scheme";
 import databaseServices from "./database.services";
 import { Chapter } from "~/models/schemas/Chapter.scheme";
-import { Collection, Filter } from "mongodb";
+import { Collection, Filter, InsertOneResult, WithId } from "mongodb";
 import { ObjectId } from "mongodb";
+import { StoryCompletedStatus } from "~/constants/enum";
 
 class storyServices {
   constructor() {}
@@ -26,19 +27,64 @@ class storyServices {
     return true;
   }
 
+  async deleteStory(story_id: string) {
+    const objectIdStory = new ObjectId(story_id);
+    await Promise.all([
+      databaseServices.storys.deleteOne({ _id: objectIdStory }),
+      databaseServices.storys.deleteMany({ story_id }),
+    ]);
+    return true;
+  }
+  async handlePrepareStoryNeedUpdate(story_info: Story): Promise<boolean> {
+    const resultFindDuplicatedStory: WithId<Story> | null =
+      await databaseServices.storys.findOne({
+        story_name: story_info.story_name,
+        auhtor_name: story_info.auhtor_name,
+      });
+
+    if (
+      resultFindDuplicatedStory !== null &&
+      resultFindDuplicatedStory.completed_status ===
+        StoryCompletedStatus.Completed
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  }
   async uploadStory(story_info: Story, chapters: Array<Chapter>) {
-    const result = await databaseServices.storys.insertOne(story_info);
+    const resultFindDuplicatedStory: WithId<Story> | null =
+      await databaseServices.storys.findOne({
+        story_name: story_info.story_name,
+        auhtor_name: story_info.auhtor_name,
+      });
+
+    if (
+      resultFindDuplicatedStory !== null &&
+      resultFindDuplicatedStory.count_chapters === story_info.count_chapters
+    ) {
+      return null;
+    }
+
+    if (resultFindDuplicatedStory !== null) {
+      console.log("delete");
+      await this.deleteStory(resultFindDuplicatedStory._id.toString());
+    }
+    const resultStoryInsert: InsertOneResult<Story> =
+      await databaseServices.storys.insertOne(story_info);
+
     const dataChapters = chapters.map((chapter) => {
-      chapter.story_id = result.insertedId;
+      chapter.story_id = resultStoryInsert.insertedId;
       return new Chapter(chapter);
     });
+
     const resultChapterInsert = await this.batchInsertChapters(
       databaseServices.chapters,
       dataChapters,
-      1000,
+      500,
     );
 
-    return result;
+    return resultStoryInsert;
   }
 
   async getListAllStory(skip: number, limit: number, search: string) {

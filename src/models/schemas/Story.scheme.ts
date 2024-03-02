@@ -13,6 +13,7 @@ interface StoryType {
   updated_at?: Date;
   completed_status: StoryCompletedStatus;
   count_followers_story?: number;
+  count_chapters: number;
   linh_thach?: number;
 }
 export class Story extends BaseSchema {
@@ -25,9 +26,10 @@ export class Story extends BaseSchema {
   story_picture: String;
   completed_status: StoryCompletedStatus;
   linh_thach: number;
+  count_chapters: number;
   constructor(story: StoryType) {
     super(story.created_at, story.updated_at);
-
+    this.count_chapters = story.count_chapters;
     this._id = story._id;
     this.story_name = story.story_name;
     this.story_picture = story.story_picture || "";

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   adminStoryUpdateInfoStoryController,
   getStoryInfoContoller,
+  handlePrepareUpdateStoryControler,
   uploadStoryController,
 } from "~/controllers/storys.controllers";
 import { getAllStoryListController } from "~/controllers/storys.controllers";
@@ -17,5 +18,9 @@ storyRouter.post(
   authMiddeware,
   adminStoryInfoUpdateMiddleWare,
   adminStoryUpdateInfoStoryController,
+);
+storyRouter.post(
+  "/prepare-check-story-update",
+  handlePrepareUpdateStoryControler,
 );
 export default storyRouter;
