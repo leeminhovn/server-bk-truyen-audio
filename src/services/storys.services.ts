@@ -80,7 +80,7 @@ class storyServices {
     const resultChapterInsert = await this.batchInsertChapters(
       databaseServices.chapters,
       dataChapters,
-      500,
+      1000,
     );
 
     return resultStoryInsert;
