@@ -3,7 +3,7 @@ import databaseServices from "./database.services";
 import User from "~/models/schemas/User.schemas";
 import { TokenType, UserVerifyStatus } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
-import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
+import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schemas";
 import { ObjectId, WithId } from "mongodb";
 
 class userService {

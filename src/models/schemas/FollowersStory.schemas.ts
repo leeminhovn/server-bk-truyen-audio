@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { BaseSchema } from "./Base.scheme";
+import { BaseSchema } from "./Base.schemas";
 
 interface FollowersStoryType {
   _id?: ObjectId;

@@ -1,9 +1,9 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import Admin from "~/models/schemas/Admin.schemas";
-import { Chapter } from "~/models/schemas/Chapter.scheme";
-import { FollowersStory } from "~/models/schemas/FollowersStory.scheme";
-import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
-import { Story } from "~/models/schemas/Story.scheme";
+import { Chapter } from "~/models/schemas/Chapter.schemas";
+import { FollowersStory } from "~/models/schemas/FollowersStory.schemas";
+import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schemas";
+import { Story } from "~/models/schemas/Story.schemas";
 import User from "~/models/schemas/User.schemas";
 
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(

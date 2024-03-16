@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { InsertOneResult } from "mongodb";
-import { Story } from "~/models/schemas/Story.scheme";
+import { Story } from "~/models/schemas/Story.schemas";
 import storysServices from "~/services/storys.services";
 
 export const uploadStoryController = async (req: Request, res: Response) => {

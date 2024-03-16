@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { Story } from "~/models/schemas/Story.scheme";
+import { Story } from "~/models/schemas/Story.schemas";
 
 export const adminStoryInfoUpdateMiddleWare = (
   req: Request,

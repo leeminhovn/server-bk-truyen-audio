@@ -1,6 +1,6 @@
-import { Story } from "~/models/schemas/Story.scheme";
+import { Story } from "~/models/schemas/Story.schemas";
 import databaseServices from "./database.services";
-import { Chapter } from "~/models/schemas/Chapter.scheme";
+import { Chapter } from "~/models/schemas/Chapter.schemas";
 import { Collection, Filter, InsertOneResult, WithId } from "mongodb";
 import { ObjectId } from "mongodb";
 import { StoryCompletedStatus } from "~/constants/enum";
@@ -80,7 +80,7 @@ class storyServices {
     const resultChapterInsert = await this.batchInsertChapters(
       databaseServices.chapters,
       dataChapters,
-      1000,
+      1500,
     );
 
     return resultStoryInsert;

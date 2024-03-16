@@ -2,7 +2,7 @@ import { signJwt } from "~/untils/jwt";
 import databaseServices from "./database.services";
 import { TokenType } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
-import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schema";
+import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schemas";
 import { ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/Admin.schemas";
 import User from "~/models/schemas/User.schemas";
