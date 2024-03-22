@@ -1,12 +1,20 @@
-import { Story } from "~/models/schemas/Story.schemas";
+import { Story } from "~/models/schemas/story/Story.schemas";
 import databaseServices from "./database.services";
-import { Chapter } from "~/models/schemas/Chapter.schemas";
+import { Chapter } from "~/models/schemas/story/Chapter.schemas";
 import { Collection, Filter, InsertOneResult, WithId } from "mongodb";
 import { ObjectId } from "mongodb";
 import { StoryCompletedStatus } from "~/constants/enum";
+import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 
 class storyServices {
   constructor() {}
+  private async addStoryGenres(stringGenres: String) {
+    // - Use in case of uploading stories
+    // - Used when updating story_info
+  }
+  private async getStoryGenres(story_id: ObjectId) {
+    //- Used in case of getting story information
+  }
 
   private async batchInsertChapters(
     collection: Collection<Chapter>,
@@ -69,6 +77,7 @@ class storyServices {
     if (resultFindDuplicatedStory !== null) {
       await this.deleteStory(resultFindDuplicatedStory._id.toString());
     }
+
     const resultStoryInsert: InsertOneResult<Story> =
       await databaseServices.storys.insertOne(story_info);
 
@@ -80,7 +89,7 @@ class storyServices {
     const resultChapterInsert = await this.batchInsertChapters(
       databaseServices.chapters,
       dataChapters,
-      1500,
+      2000,
     );
 
     return resultStoryInsert;
@@ -132,6 +141,17 @@ class storyServices {
     } catch (err) {
       console.log(err);
       return false;
+    }
+  }
+  async getAllGenres(): Promise<Array<GenreTypes>> {
+    try {
+      const data: Array<GenreTypes> = await databaseServices.genres
+        .find({})
+        .toArray();
+
+      return data;
+    } catch (err) {
+      return [];
     }
   }
 }

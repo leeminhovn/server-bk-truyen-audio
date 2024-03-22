@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { ObjectId, WithId } from "mongodb";
-import Admin from "~/models/schemas/Admin.schemas";
-import User from "~/models/schemas/User.schemas";
+import Admin from "~/models/schemas/admin/Admin.schemas";
 import adminServices from "~/services/admin.services";
 import { verifyToken } from "~/untils/jwt";
 
@@ -107,3 +106,21 @@ export const adminGetAllListUser = async (req: Request, res: Response) => {
     res.status(400).json(err);
   }
 };
+export const addGenreController = async (req:Request, res: Response)=> {
+try {
+  await adminServices.updateGenre(true,  req.body.genreName);
+  return res.status(200).json({messgae: "success"});
+
+} catch (err) {
+  return res.status(400).json(err);
+}
+}
+export const deleteGenreController =  async (req:Request, res: Response) =>{
+  try {
+    await adminServices.updateGenre(false,  '', req.body.genreId);
+    return res.status(200).json({messgae: "success"});
+  
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+}

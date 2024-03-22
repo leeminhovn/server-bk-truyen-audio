@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   adminStoryUpdateInfoStoryController,
+  getAllGenresController,
   getStoryInfoContoller,
   handlePrepareUpdateStoryControler,
   uploadStoryController,
@@ -23,4 +24,6 @@ storyRouter.post(
   "/prepare-check-story-update",
   handlePrepareUpdateStoryControler,
 );
+storyRouter.get("/get-all-genres", getAllGenresController);
+
 export default storyRouter;

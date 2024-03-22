@@ -1,9 +1,9 @@
 import { signJwt } from "~/untils/jwt";
 import databaseServices from "./database.services";
-import User from "~/models/schemas/User.schemas";
+import User from "~/models/schemas/user/User.schemas";
 import { TokenType, UserVerifyStatus } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
-import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schemas";
+import { RefreshTokenSchema } from "~/models/schemas/user/RefreshToken.schemas";
 import { ObjectId, WithId } from "mongodb";
 
 class userService {

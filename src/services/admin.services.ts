@@ -2,10 +2,10 @@ import { signJwt } from "~/untils/jwt";
 import databaseServices from "./database.services";
 import { TokenType } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
-import { RefreshTokenSchema } from "~/models/schemas/RefreshToken.schemas";
+import { RefreshTokenSchema } from "~/models/schemas/user/RefreshToken.schemas";
 import { ObjectId, WithId } from "mongodb";
-import Admin from "~/models/schemas/Admin.schemas";
-import User from "~/models/schemas/User.schemas";
+import Admin from "~/models/schemas/admin/Admin.schemas";
+import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 
 class adminServices {
   private signAccessToken(user_id: string): Promise<string> {
@@ -128,6 +128,28 @@ class adminServices {
       .toArray();
 
     return result;
+  }
+  async updateGenre(isAdd: boolean = false, type: String, idType?: string) {
+    if (isAdd) {
+      try {
+        await databaseServices.genres.insertOne(
+          new GenreTypes({ title: type + "" }),
+        );
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    } else {
+      try {
+        await databaseServices.genres.deleteOne({
+          _id: new ObjectId(idType),
+        });
+        await databaseServices.storys_genre.deleteMany({
+          _id: new ObjectId(idType),
+        });
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
   }
 }
 export default new adminServices();

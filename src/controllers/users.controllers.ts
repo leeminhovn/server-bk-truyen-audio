@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import User from "~/models/schemas/User.schemas";
+import User from "~/models/schemas/user/User.schemas";
 import databaseServices from "~/services/database.services";
 import usersServices from "~/services/users.services";
 

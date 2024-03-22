@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import { WithId } from "mongodb";
-import User from "~/models/schemas/User.schemas";
+import User from "~/models/schemas/user/User.schemas";
 import { hasPassword } from "~/untils/crypto";
 import databaseServices from "~/services/database.services";
 import { verifyToken } from "~/untils/jwt";

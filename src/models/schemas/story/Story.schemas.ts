@@ -1,13 +1,13 @@
 import { ObjectId } from "mongodb";
 import { StoryCompletedStatus } from "~/constants/enum";
-import { BaseSchema } from "./Base.schemas";
+import { BaseSchema } from "../Base.schemas";
 
 interface StoryType {
   _id?: ObjectId;
   story_name: String;
   story_picture?: String;
   auhtor_name: String;
-  story_genre: String;
+  story_genre?: String;
   story_quick_review: String;
   created_at?: Date;
   updated_at?: Date;
@@ -37,7 +37,7 @@ export class Story extends BaseSchema {
     this.story_picture = story.story_picture || "";
     this.auhtor_name = story.auhtor_name;
     this.story_quick_review = story.story_quick_review;
-    this.story_genre = story.story_genre;
+    this.story_genre = story.story_genre || "";
     this.completed_status = story.completed_status;
     this.linh_thach = story.linh_thach || 0;
     this.count_followers_story = story.count_followers_story || 0;

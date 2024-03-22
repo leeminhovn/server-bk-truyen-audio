@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { BaseSchema } from "./Base.schemas";
+import { BaseSchema } from "../Base.schemas";
 
 interface ChapterType {
   _id?: ObjectId;

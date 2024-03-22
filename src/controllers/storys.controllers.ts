@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { InsertOneResult } from "mongodb";
-import { Story } from "~/models/schemas/Story.schemas";
+import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
+import { Story } from "~/models/schemas/story/Story.schemas";
+import databaseServices from "~/services/database.services";
 import storysServices from "~/services/storys.services";
 
 export const uploadStoryController = async (req: Request, res: Response) => {
@@ -89,3 +91,7 @@ export const handlePrepareUpdateStoryControler = async (
     await storysServices.handlePrepareStoryNeedUpdate(story_info);
   return res.status(200).json({ message: statusAcceptUpdate });
 };
+export const getAllGenresController = async (req: Request, res:Response) => {
+     const data: Array<GenreTypes>   = await storysServices.getAllGenres();
+  return res.status(200).json(data);
+}
