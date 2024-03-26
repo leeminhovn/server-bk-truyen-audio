@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/admin/Admin.schemas";
 import adminServices from "~/services/admin.services";
+import databaseServices from "~/services/database.services";
 import { verifyToken } from "~/untils/jwt";
 
 export const adminLoginController = async (req: Request, res: Response) => {
@@ -39,7 +40,7 @@ export const adminRegisterController = async (req: Request, res: Response) => {
 };
 
 export const adminLogoutController = async (req: Request, res: Response) => {
-  const { user_id, refreshToken } = req.body;
+  const { user_id } = req.body;
   try {
     const result = await adminServices.logout({ user_id: user_id });
 
@@ -53,16 +54,18 @@ export const adminLogoutController = async (req: Request, res: Response) => {
     });
   }
 };
-export const adminGetAdminInfo = async (req: Request, res: Response) => {
+export const adminGetAdminInfoController = async (
+  req: Request,
+  res: Response,
+) => {
   const authorizationHeader = req.header("Authorization") || "";
-  const decode = await verifyToken(
-    authorizationHeader.split(" ")[1],
-    process.env.PRIVATE_KEY_JWT,
-  );
-  const accountFound: WithId<Admin> | null = await adminServices.getAdminInfo(
-    decode.user_id,
-  );
+  const token = authorizationHeader.split(" ")[1];
+  const decode = await verifyToken(token, process.env.PRIVATE_KEY_JWT);
+  const accountFound: WithId<Admin> | null = await adminServices.getAdminInfo({
+    user_id: decode.user_id,
+  });
   if (accountFound !== null) {
+    accountFound.accessToken = token;
     return res.status(200).json(accountFound);
   }
   return res.status(400).json({
@@ -106,21 +109,78 @@ export const adminGetAllListUser = async (req: Request, res: Response) => {
     res.status(400).json(err);
   }
 };
-export const addGenreController = async (req:Request, res: Response)=> {
-try {
-  await adminServices.updateGenre(true,  req.body.genreName);
-  return res.status(200).json({messgae: "success"});
+export const adminGetAllListAuthorsController = async (
+  req: Request,
+  res: Response,
+) => {
+  const page: number = Number(req.query.page) || 0;
+  const limit: number = Number(req.query.limit) || 20;
+  const search: string =
+    req.query?.search !== undefined ? req.query?.search.toString() : "";
 
-} catch (err) {
-  return res.status(400).json(err);
-}
-}
-export const deleteGenreController =  async (req:Request, res: Response) =>{
   try {
-    await adminServices.updateGenre(false,  '', req.body.genreId);
-    return res.status(200).json({messgae: "success"});
-  
+    console.log(search);
+    const data_storys = await adminServices.getListAllAuthor(
+      page,
+      limit,
+      search,
+    );
+
+    return res.json(data_storys);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+};
+export const addGenreController = async (req: Request, res: Response) => {
+  try {
+    await adminServices.updateGenre(true, req.body.genreName);
+    return res.status(200).json({ messgae: "success" });
   } catch (err) {
     return res.status(400).json(err);
   }
-}
+};
+export const deleteGenreController = async (req: Request, res: Response) => {
+  try {
+    await adminServices.updateGenre(false, "", req.body.genreId);
+    return res.status(200).json({ messgae: "success" });
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+export const userUpdateBlockStatusController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { block, user_id } = req.body;
+  try {
+    databaseServices.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: { isBlock: block },
+        $currentDate: { updated_at: true },
+      },
+    );
+    return res.status(200).json({ message: "Success" });
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+
+export const getAdminAccountByIdController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { user_id } = req.query;
+
+  try {
+    const result: WithId<Admin> | null =
+      await databaseServices.adminAccounts.findOne({
+        _id: new ObjectId(user_id?.toString()),
+      });
+
+    return res.status(200).json(result);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};

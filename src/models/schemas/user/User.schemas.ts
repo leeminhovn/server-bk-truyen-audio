@@ -15,8 +15,10 @@ interface UserType {
   accessToken: string;
   refreshToken: string;
   spirit_stone?: Number;
+  expired_date?: string;
   level?: String;
   area?: String;
+  isBlock?: boolean;
 }
 
 class User {
@@ -34,6 +36,8 @@ class User {
   spirit_stone: Number;
   level: String;
   area: String;
+  expired_date?: string;
+  isBlock: boolean;
 
   constructor(user: UserType) {
     const dateNow = new Date();
@@ -50,6 +54,8 @@ class User {
     this.refreshToken = user.refreshToken;
     this.spirit_stone = user.spirit_stone || 0;
     this.level = user.level || UserLevelIndex[0];
+    this.isBlock = user.isBlock || false;
+    this.expired_date = user.expired_date;
     this.area = user.area || UserAreaIndex[0];
   }
 }

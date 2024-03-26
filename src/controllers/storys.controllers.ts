@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { InsertOneResult } from "mongodb";
+import { InsertOneResult, ObjectId } from "mongodb";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { Story } from "~/models/schemas/story/Story.schemas";
 import databaseServices from "~/services/database.services";
@@ -59,6 +59,32 @@ export const getAllStoryListController = async (
   }
 };
 
+export const getAllStoryOfAuthorListController = async (
+  req: Request,
+  res: Response,
+) => {
+  const page: number = Number(req.query.page) || 0;
+  const limit: number = Number(req.query.limit) || 20;
+  const search: string =
+    req.query?.search !== undefined ? req.query?.search.toString() : "";
+  const user_id: ObjectId = new ObjectId(req.query.user_id?.toString() || 0);
+
+  try {
+    const data_storys: Array<Story> =
+      await storysServices.getListAllStoryOfAuthor(
+        page,
+        limit,
+        search,
+        user_id,
+      );
+
+    return res.json(data_storys);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
+};
+
 export const getStoryInfoContoller = async (req: Request, res: Response) => {
   const { story_id } = req.query;
   if (story_id) {
@@ -91,7 +117,7 @@ export const handlePrepareUpdateStoryControler = async (
     await storysServices.handlePrepareStoryNeedUpdate(story_info);
   return res.status(200).json({ message: statusAcceptUpdate });
 };
-export const getAllGenresController = async (req: Request, res:Response) => {
-     const data: Array<GenreTypes>   = await storysServices.getAllGenres();
+export const getAllGenresController = async (req: Request, res: Response) => {
+  const data: Array<GenreTypes> = await storysServices.getAllGenres();
   return res.status(200).json(data);
-}
+};

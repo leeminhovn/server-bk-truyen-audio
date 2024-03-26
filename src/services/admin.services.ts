@@ -44,6 +44,7 @@ class adminServices {
       this.signAccessToken(user_id.toString()),
       this.signRefreshToken(user_id.toString()),
     ]);
+
     const dataUser = new Admin({
       _id: user_id,
       email: email,
@@ -51,7 +52,9 @@ class adminServices {
       password: hasPassword(password),
       accessToken: accessToken,
       refreshToken: refreshToken,
+      role: "Auhtor",
     });
+
     await Promise.all([
       databaseServices.adminAccounts.insertOne(dataUser),
       databaseServices.refreshTokens.insertOne(
@@ -100,9 +103,8 @@ class adminServices {
   async getAdminInfo(payload: { user_id: string }) {
     const accountFound: WithId<Admin> | null =
       await databaseServices.adminAccounts.findOne({
-        user_id: payload.user_id,
+        _id: new ObjectId(payload.user_id),
       });
-
     return accountFound;
   }
   async refreshToken(user_id: string): Promise<string | null> {
@@ -129,6 +131,23 @@ class adminServices {
 
     return result;
   }
+  async getListAllAuthor(skip: number, limit: number, search: string) {
+    const searchQuery = {
+      $and: [
+        { role: { $ne: "Admin" } }, // Lọc các tài khoản có role khác "Admin"
+        search.length > 0 ? { $text: { $search: search } } : {}, // Điều kiện tìm kiếm văn bản
+      ],
+    };
+    const result = await databaseServices.adminAccounts
+      .find(searchQuery)
+      .sort({ created_at: -1 })
+
+      .limit(limit)
+      .skip(skip)
+      .toArray();
+
+    return result;
+  }
   async updateGenre(isAdd: boolean = false, type: String, idType?: string) {
     if (isAdd) {
       try {
@@ -144,12 +163,17 @@ class adminServices {
           _id: new ObjectId(idType),
         });
         await databaseServices.storys_genre.deleteMany({
-          _id: new ObjectId(idType),
+          genre_type_id: new ObjectId(idType),
         });
       } catch (err) {
         return Promise.reject(err);
       }
     }
+  }
+  async checkNameIsDuplicate(name_user: string): Promise<boolean> {
+    const resultFindName: WithId<Admin> | null =
+      await databaseServices.adminAccounts.findOne({ name: name_user });
+    return resultFindName !== null;
   }
 }
 export default new adminServices();

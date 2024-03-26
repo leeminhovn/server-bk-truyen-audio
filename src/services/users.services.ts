@@ -136,5 +136,21 @@ class userService {
       await databaseServices.users.findOne({ name: name_user });
     return resultFindName !== null;
   }
+  async getUserInfoAccount(user_id: string): Promise<WithId<User> | null> {
+    try {
+
+    const resultGet: WithId<User> | null = await databaseServices.users.findOne(
+      {
+        _id: new ObjectId(user_id),
+      },
+    );
+    return resultGet;
+  }
+ catch(err) {
+  console.log(err);
+  return null;
+ }
+  
+  }
 }
 export default new userService();

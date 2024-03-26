@@ -4,6 +4,7 @@ import {
   loginController,
   logoutController,
   registerController,
+  userInfoAccountController,
 } from "../controllers/users.controllers";
 import { authMiddeware } from "../middelwares/auth.middleware";
 import {
@@ -29,4 +30,6 @@ usersRouter.post(
 
   emailVerifyValidator,
 );
+usersRouter.get("/user-info-account", userInfoAccountController);
+usersRouter.post("/author-update-block-status", authMiddeware);
 export default usersRouter;

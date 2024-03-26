@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import User from "~/models/schemas/user/User.schemas";
 import databaseServices from "~/services/database.services";
 import usersServices from "~/services/users.services";
@@ -22,7 +22,6 @@ export const loginController = async (req: Request, res: Response) => {
 
   return res.status(400).json({ message: "fail login" });
 };
-
 export const registerController = async (req: Request, res: Response) => {
   const { email, password, name } = req.body;
   try {
@@ -37,7 +36,24 @@ export const registerController = async (req: Request, res: Response) => {
     res.status(400).json({ message: "fail register" });
   }
 };
-
+export const authorUpdateBlockStatusController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { block, user_id } = req.body;
+  try {
+    databaseServices.adminAccounts.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: { isBlock: block },
+        $currentDate: { updated_at: true },
+      },
+    );
+    return res.status(200).json({ message: "Success" });
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
 export const logoutController = async (req: Request, res: Response) => {
   const { user_id, refreshToken } = req.body;
   try {
@@ -69,4 +85,18 @@ export const emailVerifyValidator = async (req: Request, res: Response) => {
   }
   const resultVerify = await usersServices.verifyEmail(user_id);
   return res.status(200).json({ message: "Success verify email" });
+};
+
+export const userInfoAccountController = async (
+  req: Request,
+  res: Response,
+) => {
+  const resultGet: WithId<User> | null = await usersServices.getUserInfoAccount(
+    req.query.user_id?.toString() || "",
+  );
+  if (resultGet !== null) {
+    return res.status(200).json(resultGet);
+  } else {
+    return res.status(404).json({ err: "Not found account" });
+  }
 };

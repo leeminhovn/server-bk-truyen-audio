@@ -136,7 +136,7 @@ export const nameIsDuplicateMiddleware = async (
   );
 
   if (isDuplicate) {
-    return res.status(400).json({ message: "Name already exists" });
+    return res.status(400).json({ error: "Name already exists" });
   } else {
     next();
   }

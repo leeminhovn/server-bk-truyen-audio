@@ -6,17 +6,15 @@ export const authMiddeware = async (
   next: NextFunction,
 ) => {
   const authorizationHeader = req.header("Authorization");
-
-  if (!authorizationHeader) {
+  if (!authorizationHeader || !authorizationHeader.split(" ")[1]) {
     return res.status(400).json({
       message: "Authorization header is missing",
     });
   }
   try {
-    const decode = await verifyToken(
-      authorizationHeader.split(" ")[1],
-      process.env.PRIVATE_KEY_JWT,
-    );
+    const token = authorizationHeader.split(" ")[1];
+    const decode = await verifyToken(token, process.env.PRIVATE_KEY_JWT);
+    console.log(decode);
     next();
   } catch (err) {
     console.log(err);

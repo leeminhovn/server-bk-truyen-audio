@@ -7,6 +7,7 @@ import { Story } from "~/models/schemas/story/Story.schemas";
 import User from "~/models/schemas/user/User.schemas";
 import { StoryGenre } from "~/models/schemas/genre/StoryGenre.schemas";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
+import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
 
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
   process.env.DB_PASSWORD || "",
@@ -60,7 +61,11 @@ class dataBaseServices {
       process.env.DB_REFRESHTOKENS_COLLECTION || "",
     );
   }
-
+  get StoryOfAuthors(): Collection<StoryOfAuthor> {
+    return this.db_storys.collection(
+      process.env.DB_STORYS_COLLECTION_STORY_OF_AUTHORS || "",
+    );
+  }
   get storys(): Collection<Story> {
     return this.db_storys.collection(process.env.DB_STORYS_COLLECTION || "");
   }

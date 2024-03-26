@@ -1,6 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { config } from "dotenv";
-import { resolve } from "path";
 config();
 
 export function signJwt({

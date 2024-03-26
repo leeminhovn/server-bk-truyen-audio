@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   adminStoryUpdateInfoStoryController,
   getAllGenresController,
+  getAllStoryOfAuthorListController,
   getStoryInfoContoller,
   handlePrepareUpdateStoryControler,
   uploadStoryController,
@@ -13,6 +14,8 @@ import { adminStoryInfoUpdateMiddleWare } from "~/middelwares/story.middlewares"
 const storyRouter = Router();
 storyRouter.post("/upload-story", uploadStoryController);
 storyRouter.get("/get-all-storys", getAllStoryListController);
+storyRouter.get("/get-storys-of-author", getAllStoryOfAuthorListController);
+
 storyRouter.get("/get-story-info", getStoryInfoContoller);
 storyRouter.post(
   "/admin-story-info-update",
@@ -20,6 +23,7 @@ storyRouter.post(
   adminStoryInfoUpdateMiddleWare,
   adminStoryUpdateInfoStoryController,
 );
+
 storyRouter.post(
   "/prepare-check-story-update",
   handlePrepareUpdateStoryControler,
