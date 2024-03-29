@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { Story } from "~/models/schemas/story/Story.schemas";
 import databaseServices from "~/services/database.services";
-import storysServices from "~/services/storys.services";
 
 export const getStatisticsAdminController = async (
   req: Request,
@@ -96,5 +95,29 @@ export const getStatisticAuthorController = async (
   } catch (err) {
     console.log(err);
     res.status(404).json({ err: "erro" });
+  }
+};
+export const getStatisticUserCotnroller = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const listStatistic: Array<any> = await Promise.all([
+      databaseServices.storys.find().limit(10).toArray(),
+      databaseServices.storys
+        .find()
+        .sort({ count_followers_story: -1 })
+        .limit(10)
+        .toArray(),
+      databaseServices.storys
+        .find()
+        .sort({ linh_thach: -1 })
+        .limit(10)
+        .toArray(),
+    ]);
+
+    return res.status(200).json();
+  } catch (err) {
+    return res.status(400).json({ error: err });
   }
 };

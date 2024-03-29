@@ -12,6 +12,9 @@ import {
   userUpdateBlockStatusController,
   adminGetAllListAuthorsController,
   getAdminAccountByIdController,
+  deleteChapterController,
+  addChapterController,
+  editChapterController,
 } from "~/controllers/admin.controllers";
 
 import {
@@ -49,5 +52,12 @@ adminRouter.get(
   authMiddeware,
   getAdminAccountByIdController,
 );
+adminRouter.get(
+  "/delete-chapter-by-id",
+  authMiddeware,
+  deleteChapterController,
+);
+adminRouter.post("/add-chapter", authMiddeware, addChapterController);
+adminRouter.post("/edit-chapter", authMiddeware, editChapterController);
 
 export default adminRouter;

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { InsertOneResult, ObjectId } from "mongodb";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
+import { Chapter } from "~/models/schemas/story/Chapter.schemas";
 import { Story } from "~/models/schemas/story/Story.schemas";
 import databaseServices from "~/services/database.services";
 import storysServices from "~/services/storys.services";
@@ -120,4 +121,19 @@ export const handlePrepareUpdateStoryControler = async (
 export const getAllGenresController = async (req: Request, res: Response) => {
   const data: Array<GenreTypes> = await storysServices.getAllGenres();
   return res.status(200).json(data);
+};
+export const getChapterIdController = async (req: Request, res: Response) => {
+  const { chapter_id } = req.query;
+  try {
+    console.log(chapter_id);
+    const dataChapter: Chapter | null = await storysServices.getChapterId(
+      chapter_id?.toString() || "",
+    );
+
+    return dataChapter === null
+      ? res.status(404).json({ err: "Not foudn chapter" })
+      : res.status(200).json(dataChapter);
+  } catch (err) {
+    return res.status(400).json({ err: "erro some thing" });
+  }
 };

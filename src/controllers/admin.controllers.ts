@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/admin/Admin.schemas";
+import { Chapter } from "~/models/schemas/story/Chapter.schemas";
 import adminServices from "~/services/admin.services";
 import databaseServices from "~/services/database.services";
 import { verifyToken } from "~/untils/jwt";
@@ -161,6 +162,7 @@ export const userUpdateBlockStatusController = async (
         $currentDate: { updated_at: true },
       },
     );
+    console.log();
     return res.status(200).json({ message: "Success" });
   } catch (err) {
     return res.status(400).json(err);
@@ -184,3 +186,66 @@ export const getAdminAccountByIdController = async (
     return res.status(400).json(err);
   }
 };
+export const deleteChapterController = async (req: Request, res: Response) => {
+  try {
+    const { chapter_id } = req.query;
+    const chapterCurrent: Chapter | null =
+      await databaseServices.chapters.findOne({
+        _id: new ObjectId(chapter_id?.toString()),
+      });
+    if (chapterCurrent === null) {
+      return res.status(404).json({ error: "Not Found Chapter" });
+    }
+    databaseServices.chapters.deleteOne({
+      _id: new ObjectId(chapter_id?.toString()),
+    });
+
+    await databaseServices.chapters.updateMany(
+      {
+        story_id: new ObjectId(chapterCurrent.story_id),
+        index: { $gte: Number(chapterCurrent.index) },
+      }, // Match documents where index is less than 2
+      { $inc: { index: -1 } },
+    );
+    return res.status(200).json({ message: "Success delete chapter" });
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+export const addChapterController = async (req: Request, res: Response) => {
+  try {
+    const { newChapter } = req.body;
+    newChapter.story_id = new ObjectId(newChapter.story_id);
+    const countChapter: number = await databaseServices.chapters.countDocuments(
+      {
+        story_id: newChapter.story_id,
+      },
+    );
+    const data: Chapter = new Chapter(newChapter);
+    data.index = countChapter + 1;
+    await databaseServices.chapters.insertOne(data);
+    // databaseServices.chapters.
+    // thêm tính năng add truyện
+    return res.status(200).json({ message: "Insert success" });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ error: err });
+  }
+};
+export const editChapterController = async (req: Request, res: Response) => {
+  try {
+    const { editChapter } = req.body;
+
+    await databaseServices.chapters.findOneAndReplace(
+      {
+        _id: new ObjectId(editChapter._id),
+      },
+      editChapter,
+    );
+  } catch (err) {
+    return res.status(400).json({ error: err });
+  }
+};
+export const addStory = async (req: Request,res:Response) => {
+  
+}

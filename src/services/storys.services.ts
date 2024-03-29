@@ -190,14 +190,14 @@ class storyServices {
   }
 
   async getStoryInfo(story_id: string) {
-    const story_id_object = new ObjectId(story_id);
-
     try {
+      const story_id_object = new ObjectId(story_id);
+
       const [story, chapters] = await Promise.all([
         databaseServices.storys.findOne({ _id: story_id_object }),
         databaseServices.chapters
           .find({ story_id: story_id_object })
-          .project({ chapter_name: 1, _id: 1 })
+          .project({ chapter_name: 1, _id: 1, index: 1 })
           .toArray(),
       ]);
 
@@ -207,7 +207,11 @@ class storyServices {
       return [];
     }
   }
-
+  async getChapterId(chapter_id: string): Promise<Chapter | null> {
+    return await databaseServices.chapters.findOne({
+      _id: new ObjectId(chapter_id),
+    });
+  }
   async adminStoryInfoUpdate(newUpdateStory: any): Promise<boolean> {
     try {
       const newStoryDeleteId = new Story(newUpdateStory);
@@ -242,7 +246,6 @@ class storyServices {
       return [];
     }
   }
-  
 }
 
 export default new storyServices();

@@ -15,7 +15,7 @@ interface StoryType {
   count_followers_story?: number;
   count_chapters: number;
   linh_thach?: number;
-  count_starts?: number;
+  count_stars?: number;
 }
 export class Story extends BaseSchema {
   _id?: ObjectId;
@@ -27,7 +27,7 @@ export class Story extends BaseSchema {
   story_picture: String;
   completed_status: StoryCompletedStatus;
   linh_thach: number;
-  count_starts: number;
+  count_stars: number;
   count_chapters: number;
   constructor(story: StoryType) {
     super(story.created_at, story.updated_at);
@@ -41,6 +41,6 @@ export class Story extends BaseSchema {
     this.completed_status = story.completed_status;
     this.linh_thach = story.linh_thach || 0;
     this.count_followers_story = story.count_followers_story || 0;
-    this.count_starts = story.count_starts || 0;
+    this.count_stars = story.count_stars || 0;
   }
 }

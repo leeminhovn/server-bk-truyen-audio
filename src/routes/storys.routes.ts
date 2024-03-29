@@ -3,6 +3,7 @@ import {
   adminStoryUpdateInfoStoryController,
   getAllGenresController,
   getAllStoryOfAuthorListController,
+  getChapterIdController,
   getStoryInfoContoller,
   handlePrepareUpdateStoryControler,
   uploadStoryController,
@@ -29,5 +30,6 @@ storyRouter.post(
   handlePrepareUpdateStoryControler,
 );
 storyRouter.get("/get-all-genres", getAllGenresController);
+storyRouter.get("/get-chapter-by-id", getChapterIdController);
 
 export default storyRouter;
