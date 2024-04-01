@@ -1,6 +1,6 @@
 import { signJwt } from "~/untils/jwt";
 import databaseServices from "./database.services";
-import { TokenType } from "~/constants/enum";
+import { StatusAcceptStory, TokenType } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/user/RefreshToken.schemas";
 import { FindCursor, ObjectId, WithId } from "mongodb";
@@ -9,6 +9,7 @@ import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { Chapter } from "~/models/schemas/story/Chapter.schemas";
 import { Story } from "~/models/schemas/story/Story.schemas";
 import AcceptStory from "~/models/schemas/acceptStory/AcceptStory.schemas";
+import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
 
 class adminServices {
   private signAccessToken(user_id: string): Promise<string> {
@@ -204,7 +205,14 @@ class adminServices {
   ): Promise<Array<AcceptStory>> {
     try {
       const query =
-        author_id !== undefined ? { author_id: new ObjectId(author_id) } : {};
+        author_id !== undefined
+          ? {
+              $and: [
+                { author_id: new ObjectId(author_id) },
+                { status: { $ne: StatusAcceptStory.Resolve } },
+              ],
+            }
+          : {};
 
       const data: Array<AcceptStory> =
         await databaseServices.storiesNeedApproved
@@ -220,6 +228,21 @@ class adminServices {
   }
   async updateModerationStatus(): Promise<boolean> {
     try {
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+  async authorAddNewStoryInCollectionStoryOfAuthors(
+    author_id: ObjectId,
+    story_id: ObjectId,
+  ): Promise<boolean> {
+    try {
+      const newData = new StoryOfAuthor({
+        author_id: author_id,
+        story_id: story_id,
+      });
+      await databaseServices.StoryOfAuthors.insertOne(newData);
       return true;
     } catch (err) {
       return false;

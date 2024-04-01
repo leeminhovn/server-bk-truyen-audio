@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ObjectId, WithId } from "mongodb";
+import { InsertOneResult, ObjectId, WithId } from "mongodb";
 import { StatusAcceptStory } from "~/constants/enum";
 import AcceptStory from "~/models/schemas/acceptStory/AcceptStory.schemas";
 import Admin from "~/models/schemas/admin/Admin.schemas";
@@ -290,10 +290,21 @@ export const updateModerationStatusController = async (
   res: Response,
 ) => {
   try {
-    const { status, moderator_feedback,story, _id } = req.body;
+    const { status, moderator_feedback, story, author_id, _id } = req.body;
     if (status === 1) {
-        const newStory = new Story(story);
-         storysServices.uploadStory(newStory,[]);
+      const newStory = new Story(story);
+      const resultStoryInsert: InsertOneResult<Story> | null =
+        await storysServices.uploadStory(newStory, []);
+
+      if (resultStoryInsert === null) {
+        return res.status(400).json({ error: "Error" });
+      }
+      const idStory = resultStoryInsert.insertedId;
+      // id truyện
+      await adminServices.authorAddNewStoryInCollectionStoryOfAuthors(
+        new ObjectId(author_id),
+        idStory,
+      );
     }
     await databaseServices.storiesNeedApproved.findOneAndUpdate(
       {
