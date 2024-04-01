@@ -8,6 +8,7 @@ import User from "~/models/schemas/user/User.schemas";
 import { StoryGenre } from "~/models/schemas/genre/StoryGenre.schemas";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
+import AcceptStory from "~/models/schemas/acceptStory/AcceptStory.schemas";
 
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
   process.env.DB_PASSWORD || "",
@@ -81,6 +82,9 @@ class dataBaseServices {
   }
   get chapters(): Collection<Chapter> {
     return this.db_storys.collection(process.env.DB_CHAPTERS_COLLECTION || "");
+  }
+  get storiesNeedApproved():Collection<AcceptStory>{
+    return this.db_storys.collection(process.env.DB_STORIES_COLLECTION_STORIES_NEED_APPROVED ||"");
   }
 }
 

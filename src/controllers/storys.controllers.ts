@@ -3,7 +3,6 @@ import { InsertOneResult, ObjectId } from "mongodb";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { Chapter } from "~/models/schemas/story/Chapter.schemas";
 import { Story } from "~/models/schemas/story/Story.schemas";
-import databaseServices from "~/services/database.services";
 import storysServices from "~/services/storys.services";
 
 export const uploadStoryController = async (req: Request, res: Response) => {
@@ -48,7 +47,7 @@ export const getAllStoryListController = async (
 
   try {
     const data_storys: Array<Story> = await storysServices.getListAllStory(
-      page,
+      page * limit,
       limit,
       search,
     );
@@ -125,7 +124,6 @@ export const getAllGenresController = async (req: Request, res: Response) => {
 export const getChapterIdController = async (req: Request, res: Response) => {
   const { chapter_id } = req.query;
   try {
-    console.log(chapter_id);
     const dataChapter: Chapter | null = await storysServices.getChapterId(
       chapter_id?.toString() || "",
     );

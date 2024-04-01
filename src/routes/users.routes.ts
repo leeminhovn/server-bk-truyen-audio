@@ -32,4 +32,5 @@ usersRouter.post(
 );
 usersRouter.get("/user-info-account", userInfoAccountController);
 usersRouter.post("/author-update-block-status", authMiddeware);
+
 export default usersRouter;

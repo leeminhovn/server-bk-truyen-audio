@@ -14,7 +14,6 @@ export const authMiddeware = async (
   try {
     const token = authorizationHeader.split(" ")[1];
     const decode = await verifyToken(token, process.env.PRIVATE_KEY_JWT);
-    console.log(decode);
     next();
   } catch (err) {
     console.log(err);

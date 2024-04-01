@@ -15,6 +15,9 @@ import {
   deleteChapterController,
   addChapterController,
   editChapterController,
+  addStoryByAuthorController,
+  getStoryNeedApprovedController,
+  updateModerationStatusController,
 } from "~/controllers/admin.controllers";
 
 import {
@@ -59,5 +62,27 @@ adminRouter.get(
 );
 adminRouter.post("/add-chapter", authMiddeware, addChapterController);
 adminRouter.post("/edit-chapter", authMiddeware, editChapterController);
+
+/* 
+thêm truyện với author
+get các lượt duyệt truyện
+xác nhận truyện
+
+*/
+adminRouter.post(
+  "/author/add-story-need-approved",
+  authMiddeware,
+  addStoryByAuthorController,
+);
+adminRouter.get(
+  "/get-stories-need-approved",
+  authMiddeware,
+  getStoryNeedApprovedController,
+);
+adminRouter.post(
+  "/update-moderation-status",
+  authMiddeware,
+  updateModerationStatusController,
+);
 
 export default adminRouter;

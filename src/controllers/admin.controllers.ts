@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import { ObjectId, WithId } from "mongodb";
+import { StatusAcceptStory } from "~/constants/enum";
+import AcceptStory from "~/models/schemas/acceptStory/AcceptStory.schemas";
 import Admin from "~/models/schemas/admin/Admin.schemas";
 import { Chapter } from "~/models/schemas/story/Chapter.schemas";
+import { Story } from "~/models/schemas/story/Story.schemas";
 import adminServices from "~/services/admin.services";
 import databaseServices from "~/services/database.services";
+import storysServices from "~/services/storys.services";
 import { verifyToken } from "~/untils/jwt";
 
 export const adminLoginController = async (req: Request, res: Response) => {
@@ -120,9 +124,8 @@ export const adminGetAllListAuthorsController = async (
     req.query?.search !== undefined ? req.query?.search.toString() : "";
 
   try {
-    console.log(search);
     const data_storys = await adminServices.getListAllAuthor(
-      page,
+      page * limit,
       limit,
       search,
     );
@@ -246,6 +249,66 @@ export const editChapterController = async (req: Request, res: Response) => {
     return res.status(400).json({ error: err });
   }
 };
-export const addStory = async (req: Request,res:Response) => {
-  
-}
+export const addStoryByAuthorController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { story, author_id, author_message } = req.body;
+    await adminServices.addStoryByAuthor(story, author_id, author_message);
+    return res.status(200).json({ message: "success" });
+  } catch (err) {
+    return res.status(400).json({ error: err });
+  }
+};
+export const getStoryNeedApprovedController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { page = 0, limit = 20, author_id } = req.query;
+    const queryCountRequest = author_id
+      ? { author_id: new Object(author_id) }
+      : {};
+    console.log(page, limit, author_id);
+    const [dataStories, totalData] = await Promise.all([
+      adminServices.getStoriesNeedApproved(
+        Number(page),
+        Number(limit),
+        author_id?.toString() || undefined,
+      ),
+      databaseServices.storiesNeedApproved.countDocuments(queryCountRequest),
+    ]);
+
+    return res.status(200).json({ data: dataStories, totalData: totalData });
+  } catch (err) {
+    return res.status(400).json({ error: err });
+  }
+};
+export const updateModerationStatusController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { status, moderator_feedback,story, _id } = req.body;
+    if (status === 1) {
+        const newStory = new Story(story);
+         storysServices.uploadStory(newStory,[]);
+    }
+    await databaseServices.storiesNeedApproved.findOneAndUpdate(
+      {
+        _id: new ObjectId(_id),
+      },
+      {
+        $set: {
+          status: Number(status),
+          moderator_feedback,
+        },
+      },
+    );
+    return res.status(200).json({ message: "success" });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ error: err });
+  }
+};

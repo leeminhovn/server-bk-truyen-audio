@@ -12,3 +12,8 @@ export enum StoryCompletedStatus {
   Updating,
   Completed,
 }
+export enum StatusAcceptStory {
+  Pending,
+  Resolve,
+  Reject,
+}

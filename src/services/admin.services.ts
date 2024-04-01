@@ -3,10 +3,12 @@ import databaseServices from "./database.services";
 import { TokenType } from "~/constants/enum";
 import { hasPassword } from "~/untils/crypto";
 import { RefreshTokenSchema } from "~/models/schemas/user/RefreshToken.schemas";
-import { ObjectId, WithId } from "mongodb";
+import { FindCursor, ObjectId, WithId } from "mongodb";
 import Admin from "~/models/schemas/admin/Admin.schemas";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { Chapter } from "~/models/schemas/story/Chapter.schemas";
+import { Story } from "~/models/schemas/story/Story.schemas";
+import AcceptStory from "~/models/schemas/acceptStory/AcceptStory.schemas";
 
 class adminServices {
   private signAccessToken(user_id: string): Promise<string> {
@@ -177,6 +179,51 @@ class adminServices {
     return resultFindName !== null;
   }
 
-  
+  async addStoryByAuthor(
+    story: Story,
+    author_id: String,
+    author_message: string,
+  ): Promise<boolean> {
+    try {
+      const acceptStory = new AcceptStory({
+        story,
+        author_id: new ObjectId(author_id.toString()),
+        author_message,
+      });
+      await databaseServices.storiesNeedApproved.insertOne(acceptStory);
+
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+  async getStoriesNeedApproved(
+    page: number,
+    limit: number,
+    author_id: string | undefined,
+  ): Promise<Array<AcceptStory>> {
+    try {
+      const query =
+        author_id !== undefined ? { author_id: new ObjectId(author_id) } : {};
+
+      const data: Array<AcceptStory> =
+        await databaseServices.storiesNeedApproved
+          .find(query)
+          .sort({ created_at: -1 })
+          .limit(limit)
+          .skip(page)
+          .toArray();
+      return data;
+    } catch (err) {
+      return [];
+    }
+  }
+  async updateModerationStatus(): Promise<boolean> {
+    try {
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
 }
 export default new adminServices();

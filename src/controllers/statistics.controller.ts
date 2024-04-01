@@ -97,7 +97,7 @@ export const getStatisticAuthorController = async (
     res.status(404).json({ err: "erro" });
   }
 };
-export const getStatisticUserCotnroller = async (
+export const getStatisticUserController = async (
   req: Request,
   res: Response,
 ) => {
@@ -116,7 +116,11 @@ export const getStatisticUserCotnroller = async (
         .toArray(),
     ]);
 
-    return res.status(200).json();
+    return res.status(200).json({
+      story_top_ten_of_week: listStatistic[0],
+      story_top_ten_followers: listStatistic[1],
+      story_top_ten_money: listStatistic[2],
+    });
   } catch (err) {
     return res.status(400).json({ error: err });
   }
