@@ -31,5 +31,5 @@ storyRouter.post(
 );
 storyRouter.get("/get-all-genres", getAllGenresController);
 storyRouter.get("/get-chapter-by-id", getChapterIdController);
-
+storyRouter.get("get-all-chapters", )
 export default storyRouter;

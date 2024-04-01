@@ -135,3 +135,16 @@ export const getChapterIdController = async (req: Request, res: Response) => {
     return res.status(400).json({ err: "erro some thing" });
   }
 };
+export const getAllChaptersController = async (req: Request, res: Response) => {
+  try {
+    const { story_id } = req.query;
+    if (story_id === undefined) {
+      return res.status(400).json({ err: "Not found story" });
+    }
+    const data = await storysServices.getAllChapters(story_id?.toString());
+
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(400).json({ err: "erro some thing" });
+  }
+};

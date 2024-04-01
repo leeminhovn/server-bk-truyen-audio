@@ -159,7 +159,6 @@ class storyServices {
       .limit(limit)
       .skip(skip)
       .toArray();
-
     return result;
   }
   async getListAllStoryOfAuthor(
@@ -241,6 +240,19 @@ class storyServices {
         .find({})
         .toArray();
 
+      return data;
+    } catch (err) {
+      return [];
+    }
+  }
+  async getAllChapters(story_id: string) {
+    try {
+      const data = databaseServices.chapters
+        .find({
+          _id: new ObjectId(story_id),
+        })
+        .project({ chapter_name: 1, _id: 1, index: 1 })
+        .toArray();
       return data;
     } catch (err) {
       return [];

@@ -270,7 +270,6 @@ export const getStoryNeedApprovedController = async (
     const queryCountRequest = author_id
       ? { author_id: new Object(author_id) }
       : {};
-    console.log(page, limit, author_id);
     const [dataStories, totalData] = await Promise.all([
       adminServices.getStoriesNeedApproved(
         Number(page),

@@ -209,7 +209,7 @@ class adminServices {
           ? {
               $and: [
                 { author_id: new ObjectId(author_id) },
-                { status: { $ne: StatusAcceptStory.Resolve } },
+                // { status: { $ne: StatusAcceptStory.Resolve } },
               ],
             }
           : {};
