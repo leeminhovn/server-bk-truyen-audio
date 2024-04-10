@@ -48,7 +48,12 @@ class userService {
   }
   constructor() {}
 
-  async register(payload: { email: string; password: string; name: string }) {
+  async register(payload: {
+    email: string;
+    password: string;
+    name: string;
+    device_uuid: string;
+  }) {
     const user_id = new ObjectId();
     const { email, password, name } = payload;
 
@@ -138,19 +143,15 @@ class userService {
   }
   async getUserInfoAccount(user_id: string): Promise<WithId<User> | null> {
     try {
-
-    const resultGet: WithId<User> | null = await databaseServices.users.findOne(
-      {
-        _id: new ObjectId(user_id),
-      },
-    );
-    return resultGet;
-  }
- catch(err) {
-  console.log(err);
-  return null;
- }
-  
+      const resultGet: WithId<User> | null =
+        await databaseServices.users.findOne({
+          _id: new ObjectId(user_id),
+        });
+      return resultGet;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 }
 export default new userService();

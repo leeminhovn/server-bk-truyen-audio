@@ -7,6 +7,8 @@ import { StoryCompletedStatus } from "~/constants/enum";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { arraysHaveSameElements } from "~/helpers/array";
 import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
+import { ReadingHistory } from "~/models/schemas/readingHistory/ReadingHistory.schemas";
+import { create } from "domain";
 
 class storyServices {
   constructor() {}
@@ -206,6 +208,20 @@ class storyServices {
       return [];
     }
   }
+  async getStory(story_id: string): Promise<Story | null> {
+    try {
+      const story_id_object = new ObjectId(story_id);
+
+      const story: Story | null = await databaseServices.storys.findOne({
+        _id: story_id_object,
+      });
+
+      return story;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
   async getChapterId(chapter_id: string): Promise<Chapter | null> {
     return await databaseServices.chapters.findOne({
       _id: new ObjectId(chapter_id),
@@ -245,17 +261,203 @@ class storyServices {
       return [];
     }
   }
-  async getAllChapters(story_id: string) {
+  async getAllChapters(story_id: string, page: number, limit: number) {
     try {
-      const data = databaseServices.chapters
+      const data = await databaseServices.chapters
         .find({
-          _id: new ObjectId(story_id),
+          story_id: new ObjectId(story_id),
         })
         .project({ chapter_name: 1, _id: 1, index: 1 })
+        .sort({ index: 1 })
+        .limit(limit)
+        .skip(limit * page)
         .toArray();
       return data;
     } catch (err) {
       return [];
+    }
+  }
+  async getNextChapter(
+    story_id: string,
+    index: number,
+  ): Promise<Chapter | null> {
+    try {
+      const data: Chapter | null = await databaseServices.chapters.findOne({
+        story_id: new ObjectId(story_id),
+        index: index + 1,
+      });
+      return data;
+    } catch (err) {
+      return null;
+    }
+  }
+  async getPrevChapter(
+    story_id: string,
+    index: number,
+  ): Promise<Chapter | null> {
+    try {
+      const data = await databaseServices.chapters.findOne({
+        story_id: new ObjectId(story_id),
+        index: index - 1,
+      });
+
+      return data;
+    } catch (err) {
+      return null;
+    }
+  }
+  async getListStoriesById(
+    listStoriesId: Array<String>,
+  ): Promise<Array<Story>> {
+    let listData: Array<Story> = new Array<Story>();
+
+    try {
+      listData = await Promise.all(
+        listStoriesId.map(async (story_id: String) => {
+          const data: Story | null = await databaseServices.storys.findOne({
+            _id: new ObjectId(story_id.toString()),
+          });
+          return data!;
+        }),
+      );
+    } catch (err) {
+      console.log(err);
+    }
+    return listData;
+  }
+  async addReadHistoryForUser(readHistory: ReadingHistory) {
+    try {
+      readHistory.chapter_id = new ObjectId(readHistory.chapter_id);
+      readHistory.story_id = new ObjectId(readHistory.story_id);
+      const user_id = readHistory.user_id;
+      if (user_id != "") {
+        readHistory.user_id = new ObjectId(user_id);
+      }
+      const dataFindDuplicate: ReadingHistory | null =
+        await databaseServices.reading_history_user.findOne({
+          device_uuid: readHistory.device_uuid,
+          user_id: readHistory.user_id,
+          chapter_id: readHistory.chapter_id,
+        });
+
+      if (dataFindDuplicate === null) {
+        readHistory.index =
+          (await databaseServices.reading_history_user.countDocuments({
+            device_uuid: readHistory.device_uuid,
+            story_id: new ObjectId(readHistory.story_id),
+          })) + 1;
+
+        if (readHistory.index === 1) {
+          console.log("update count read");
+          // update lượt đọc của bộ truyện đó
+
+          databaseServices.storys.findOneAndUpdate(
+            {
+              _id: new ObjectId(readHistory.story_id),
+            },
+            {
+              $inc: {
+                count_read: 1,
+              },
+            },
+          );
+        }
+        await databaseServices.reading_history_user.insertOne(readHistory);
+      } else {
+        return Promise.reject(() => {
+          throw "chapter is duplicate";
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      return Promise.reject(() => {
+        throw err;
+      });
+    }
+  }
+  async getReadingHistoryForBooks(
+    page: number,
+    limit: number,
+    device_uuid: string,
+    user_id: string,
+  ): Promise<Array<Story>> {
+    try {
+      console.log(device_uuid, user_id);
+      const pipeline = [
+        {
+          $match: {
+            device_uuid: device_uuid,
+            user_id: user_id.length > 0 ? new ObjectId(user_id) : "",
+          },
+        },
+        { $sort: { index: -1 } },
+        {
+          $group: {
+            _id: { $toString: "$story_id" },
+            maxIndexItem: { $first: "$$ROOT" }, // Chọn tài liệu có index lớn nhất từ mỗi nhóm
+          },
+        },
+        { $replaceRoot: { newRoot: "$maxIndexItem" } },
+        { $skip: page * limit },
+        { $limit: limit },
+      ];
+
+      const dataReadingHistories = await databaseServices.reading_history_user
+        .aggregate(pipeline)
+        .toArray();
+
+      const sortArray = dataReadingHistories.sort((a, b) => b.index - a.index);
+
+      return await this.getListStoriesById(sortArray.map((e) => e.story_id));
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+  async getCurrentChapterInStory(
+    story_id: string,
+    user_id: string,
+    device_uuid: string,
+  ): Promise<Chapter | null> {
+    try {
+      console.log(story_id, user_id);
+
+      const queryHistory = {
+        story_id: new ObjectId(story_id),
+        [user_id.length > 0 ? "user_id" : "device_uuid"]:
+          user_id.length > 0 ? new ObjectId(user_id) : device_uuid,
+      };
+      const history: ReadingHistory[] =
+        await databaseServices.reading_history_user
+          .find(queryHistory)
+          .sort({ index: -1 })
+          .limit(1)
+          .toArray();
+      if (history.length === 0) {
+        return null;
+      }
+      return await databaseServices.chapters.findOne({
+        _id: new ObjectId(history[0].chapter_id),
+      });
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
+  async getCheckUserNeedSynchronized(
+    story_id: string,
+    user_id: string,
+  ): Promise<boolean> {
+    try {
+      const isFoundAccountStoryReading =
+        databaseServices.reading_history_user.findOne({
+          story_id: new ObjectId(story_id),
+          user_id: new ObjectId(user_id),
+        });
+
+      return true;
+    } catch (err) {
+      return false;
     }
   }
 }

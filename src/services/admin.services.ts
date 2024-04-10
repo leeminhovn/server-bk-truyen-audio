@@ -219,7 +219,7 @@ class adminServices {
           .find(query)
           .sort({ created_at: -1 })
           .limit(limit)
-          .skip(page)
+          .skip(limit * page)
           .toArray();
       return data;
     } catch (err) {

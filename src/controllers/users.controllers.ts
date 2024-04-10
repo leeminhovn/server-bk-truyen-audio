@@ -6,7 +6,7 @@ import usersServices from "~/services/users.services";
 
 export const loginController = async (req: Request, res: Response) => {
   const user_id: ObjectId = req.body.dataUser._id;
-
+  console.log("login");
   try {
     const [accessToken, refreshToken] = await usersServices.login({
       user_id: user_id.toString(),
@@ -23,12 +23,13 @@ export const loginController = async (req: Request, res: Response) => {
   return res.status(400).json({ message: "fail login" });
 };
 export const registerController = async (req: Request, res: Response) => {
-  const { email, password, name } = req.body;
+  const { email, password, name, device_uuid } = req.body;
   try {
     const dataUser: User = await usersServices.register({
       email,
       password,
       name,
+      device_uuid,
     });
     res.status(200).json(dataUser);
   } catch (err) {

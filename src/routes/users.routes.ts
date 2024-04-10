@@ -30,6 +30,7 @@ usersRouter.post(
 
   emailVerifyValidator,
 );
+
 usersRouter.get("/user-info-account", userInfoAccountController);
 usersRouter.post("/author-update-block-status", authMiddeware);
 

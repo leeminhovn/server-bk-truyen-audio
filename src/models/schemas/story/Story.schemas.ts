@@ -15,7 +15,9 @@ interface StoryType {
   count_followers_story?: number;
   count_chapters: number;
   linh_thach?: number;
+  count_read?: number;
   count_stars?: number;
+  is_show?: boolean;
 }
 export class Story extends BaseSchema {
   _id?: ObjectId;
@@ -29,6 +31,9 @@ export class Story extends BaseSchema {
   linh_thach: number;
   count_stars: number;
   count_chapters: number;
+  is_show: boolean;
+  count_read: number;
+
   constructor(story: StoryType) {
     super(story.created_at, story.updated_at);
     this.count_chapters = story.count_chapters;
@@ -42,5 +47,7 @@ export class Story extends BaseSchema {
     this.linh_thach = story.linh_thach || 0;
     this.count_followers_story = story.count_followers_story || 0;
     this.count_stars = story.count_stars || 0;
+    this.count_read = story.count_read || 0;
+    this.is_show = story.is_show === undefined ? true : story.is_show;
   }
 }

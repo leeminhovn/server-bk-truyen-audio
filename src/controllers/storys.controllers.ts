@@ -1,8 +1,11 @@
+import exp from "constants";
 import { Request, Response } from "express";
 import { InsertOneResult, ObjectId } from "mongodb";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
+import { ReadingHistory } from "~/models/schemas/readingHistory/ReadingHistory.schemas";
 import { Chapter } from "~/models/schemas/story/Chapter.schemas";
 import { Story } from "~/models/schemas/story/Story.schemas";
+import databaseServices from "~/services/database.services";
 import storysServices from "~/services/storys.services";
 
 export const uploadStoryController = async (req: Request, res: Response) => {
@@ -95,6 +98,21 @@ export const getStoryInfoContoller = async (req: Request, res: Response) => {
     res.status(404).json({ message: "Not found story" });
   }
 };
+export const getStoryContoller = async (req: Request, res: Response) => {
+  const { story_id } = req.query;
+  if (story_id) {
+    const infoStory: Story | null = await storysServices.getStory(
+      story_id.toString(),
+    );
+    if (infoStory === null) {
+      return res.status(404).json({ message: "Not found story" });
+    }
+
+    return res.status(200).json(infoStory);
+  } else {
+    res.status(404).json({ message: "Not found story" });
+  }
+};
 export const adminStoryUpdateInfoStoryController = async (
   req: Request,
   res: Response,
@@ -137,14 +155,132 @@ export const getChapterIdController = async (req: Request, res: Response) => {
 };
 export const getAllChaptersController = async (req: Request, res: Response) => {
   try {
-    const { story_id } = req.query;
+    const { story_id, page = 0, limit = 20 } = req.query;
     if (story_id === undefined) {
       return res.status(400).json({ err: "Not found story" });
     }
-    const data = await storysServices.getAllChapters(story_id?.toString());
+    const data = await storysServices.getAllChapters(
+      story_id?.toString(),
+      Number(page),
+      Number(limit),
+    );
 
     return res.status(200).json(data);
   } catch (err) {
     return res.status(400).json({ err: "erro some thing" });
+  }
+};
+export const getNextChapterController = async (req: Request, res: Response) => {
+  try {
+    const { story_id, index } = req.query;
+    const data: Chapter | null = await storysServices.getNextChapter(
+      story_id?.toString() || "",
+      Number(index),
+    );
+    if (data === null) {
+      return res.status(404).json({ message: "Out range index chapter" });
+    }
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(400).json({ err: "erro some thing" });
+  }
+};
+export const getPrevChapterController = async (req: Request, res: Response) => {
+  try {
+    const { story_id, index } = req.query;
+    const data: Chapter | null = await storysServices.getPrevChapter(
+      story_id?.toString() || "",
+      Number(index),
+    );
+    if (data === null) {
+      return res.status(404).json({ message: "Out range index chapter" });
+    }
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(400).json({ err: "erro some thing" });
+  }
+};
+export const getListStoriesByIdController = async (
+  req: Request,
+  res: Response,
+) => {
+  const { listIdStories } = req.body;
+  try {
+    const listData: Array<Story> =
+      await storysServices.getListStoriesById(listIdStories);
+    return res.status(200).json(listData);
+  } catch (err) {
+    return res.status(400).json({ err: "error some thing" });
+  }
+};
+export const addReadHistoryForUserController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { history_read } = req.body;
+    console.log(req.body, "check");
+    const readHistory: ReadingHistory = new ReadingHistory(history_read);
+    await storysServices.addReadHistoryForUser(readHistory);
+    res.status(200).json({ message: "Success add history" });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ err: err });
+  }
+};
+export const getReadingHistoryForBooksController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    let { page, limit, device_uuid, user_id } = req.query;
+    const data: Array<Story> = await storysServices.getReadingHistoryForBooks(
+      Number(page?.toString() || 0),
+      Number(limit?.toString() || 0),
+      device_uuid?.toString() || "",
+      user_id?.toString() || "",
+    );
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ error: "Get Faile" });
+  }
+};
+
+export const getCurrentChapterInStoryController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { story_id, user_id, device_uuid } = req.query;
+    const data: Chapter | null = await storysServices.getCurrentChapterInStory(
+      story_id?.toString() || "",
+      user_id?.toString() || "",
+      device_uuid?.toString() || "",
+    );
+    console.log(data);
+    if (data === null) {
+      return res.status(404).json({ error: "Not found chapter" });
+    }
+    return res.status(200).json(data);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ error: "Get Faile" });
+  }
+};
+export const getCheckUserNeedSynchronizedController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { story_id, user_id } = req.query;
+    const isNeedSynchronized =
+      await storysServices.getCheckUserNeedSynchronized(
+        story_id?.toString() || "",
+        user_id?.toString() || "",
+      );
+    return res.status(200).json();
+  } catch (err) {
+    return res.status(400).json({ error: "Get Faile" });
   }
 };

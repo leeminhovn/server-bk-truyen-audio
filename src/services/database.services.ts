@@ -1,7 +1,6 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import Admin from "~/models/schemas/admin/Admin.schemas";
 import { Chapter } from "~/models/schemas/story/Chapter.schemas";
-import { FollowersStory } from "~/models/schemas/story/FollowersStory.schemas";
 import { RefreshTokenSchema } from "~/models/schemas/user/RefreshToken.schemas";
 import { Story } from "~/models/schemas/story/Story.schemas";
 import User from "~/models/schemas/user/User.schemas";
@@ -9,6 +8,7 @@ import { StoryGenre } from "~/models/schemas/genre/StoryGenre.schemas";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
 import AcceptStory from "~/models/schemas/acceptStory/AcceptStory.schemas";
+import { ReadingHistory } from "~/models/schemas/readingHistory/ReadingHistory.schemas";
 
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
   process.env.DB_PASSWORD || "",
@@ -53,9 +53,7 @@ class dataBaseServices {
       process.env.DB_ADMIN_ACCOUNTS_COLLECTION || "",
     );
   }
-  get followersStory(): Collection<FollowersStory> {
-    return this.db_users.collection(process.env.DB_FOLLOWERS_STORYS || "");
-  }
+
 
   get refreshTokens(): Collection<RefreshTokenSchema> {
     return this.db_users.collection(
@@ -73,6 +71,11 @@ class dataBaseServices {
   get storys_genre(): Collection<StoryGenre> {
     return this.db_storys.collection(
       process.env.DB_STORYS_COLLECTION_STORYS_GENRE || "",
+    );
+  }
+  get reading_history_user(): Collection<ReadingHistory> {
+    return this.db_storys.collection(
+      process.env.DB_STORYS_COLLECTION_READING_HISTORIES_USER || "",
     );
   }
   get genres(): Collection<GenreTypes> {
