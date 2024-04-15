@@ -26,6 +26,10 @@ export const loginValidator = async (
     return res.status(400).json({
       error: "Password is wrong",
     });
+  } else if(accountCheck.isBlock === true) {
+    return res.status(400).json({
+      error: "Account is block",
+    });
   }
   _req.body.dataUser = accountCheck;
   next();
@@ -63,9 +67,8 @@ export const registerValidate = async (
       if (accountCheck === null) {
         return next();
       }
-      return res.json({
-        message: "This account already exists",
-        statusCode: 409,
+      return res.status(409).json({
+        error: "This account already exists",
       });
     }
   }

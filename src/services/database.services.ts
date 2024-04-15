@@ -9,6 +9,7 @@ import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
 import AcceptStory from "~/models/schemas/acceptStory/AcceptStory.schemas";
 import { ReadingHistory } from "~/models/schemas/readingHistory/ReadingHistory.schemas";
+import { UserFollowedStory } from "~/models/schemas/userFollowedStory/UserFollowedStory.schemas";
 
 const uri = `mongodb://${process.env.DB_USERNAME}:${encodeURIComponent(
   process.env.DB_PASSWORD || "",
@@ -54,7 +55,6 @@ class dataBaseServices {
     );
   }
 
-
   get refreshTokens(): Collection<RefreshTokenSchema> {
     return this.db_users.collection(
       process.env.DB_REFRESHTOKENS_COLLECTION || "",
@@ -78,6 +78,11 @@ class dataBaseServices {
       process.env.DB_STORYS_COLLECTION_READING_HISTORIES_USER || "",
     );
   }
+  get user_followed_stories(): Collection<UserFollowedStory> {
+    return this.db_storys.collection(
+      process.env.DB_STORIES_COLLECTION_USER_FOLLOWED_STORIES || "",
+    );
+  }
   get genres(): Collection<GenreTypes> {
     return this.db_storys.collection(
       process.env.DB_STORYS_COLLECTION_GENRES || "",
@@ -86,8 +91,10 @@ class dataBaseServices {
   get chapters(): Collection<Chapter> {
     return this.db_storys.collection(process.env.DB_CHAPTERS_COLLECTION || "");
   }
-  get storiesNeedApproved():Collection<AcceptStory>{
-    return this.db_storys.collection(process.env.DB_STORIES_COLLECTION_STORIES_NEED_APPROVED ||"");
+  get storiesNeedApproved(): Collection<AcceptStory> {
+    return this.db_storys.collection(
+      process.env.DB_STORIES_COLLECTION_STORIES_NEED_APPROVED || "",
+    );
   }
 }
 

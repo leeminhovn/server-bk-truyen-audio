@@ -5,6 +5,8 @@ import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { ReadingHistory } from "~/models/schemas/readingHistory/ReadingHistory.schemas";
 import { Chapter } from "~/models/schemas/story/Chapter.schemas";
 import { Story } from "~/models/schemas/story/Story.schemas";
+import { StoryWithIdChapterUpdate } from "~/models/schemas/story/StoryWithIdChapterUpdate.schemas";
+import { UserFollowedStory } from "~/models/schemas/userFollowedStory/UserFollowedStory.schemas";
 import databaseServices from "~/services/database.services";
 import storysServices from "~/services/storys.services";
 
@@ -273,14 +275,130 @@ export const getCheckUserNeedSynchronizedController = async (
   res: Response,
 ) => {
   try {
-    const { story_id, user_id } = req.query;
+    const { user_id, device_uuid } = req.query;
     const isNeedSynchronized =
       await storysServices.getCheckUserNeedSynchronized(
-        story_id?.toString() || "",
         user_id?.toString() || "",
+        device_uuid?.toString() || "",
       );
-    return res.status(200).json();
+    return res.status(200).json(isNeedSynchronized);
   } catch (err) {
     return res.status(400).json({ error: "Get Faile" });
+  }
+};
+export const makeSynchronizedForUserController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { device_uuid, user_id, is_synchronized } = req.query;
+    await storysServices.makeSynchronizedForUser(
+      device_uuid?.toString() || "",
+      user_id?.toString() || "",
+      is_synchronized === "true",
+    );
+    return res.status(200).json({ message: "Success Synchronized" });
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+export const getFollowedStoriesController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { user_id, page, limit } = req.query;
+    if (!user_id) {
+      return res.status(404).json({ error: "Not found user id" });
+    }
+    const listDataStories: Array<StoryWithIdChapterUpdate> =
+      await storysServices.getFollowedStories(
+        user_id?.toString() || "",
+        Number(page || 0),
+        Number(limit || 10),
+      );
+
+    return res.status(200).json(listDataStories);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ error: err });
+  }
+};
+export const updateFollowStoryController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { user_id, story_id, status_follow } = req.body;
+    console.log(status_follow);
+    await storysServices.updateFollowStory(
+      user_id?.toString() || "",
+      story_id?.toString() || "",
+      status_follow,
+    );
+    return res.status(200).json("Success");
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+};
+export const getFollowedStoryInfoController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { user_id, story_id } = req.query;
+    const data: UserFollowedStory | null =
+      await storysServices.getFollowedStoryInfo(
+        user_id?.toString() || "",
+        story_id?.toString() || "",
+      );
+    if (data === null) {
+      return res.status(404).json({ error: "This story not followed" });
+    }
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(400).json({ error: err });
+  }
+};
+export const getCountNewChapterStoriesController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { user_id } = req.query;
+    console.log(user_id);
+    if (!user_id) {
+      return res.status(404).json({ error: "Not found user_id" });
+    }
+    const count: number =
+      await databaseServices.user_followed_stories.countDocuments({
+        user_id: new ObjectId(user_id + ""),
+        // id_new_chapter: { $ne: null }
+      });
+    console.log(count);
+    return res.status(200).json(count);
+  } catch (err) {
+    return res.status(400).json({ error: err });
+  }
+};
+
+export const getListStoriesByGenreController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { genre_id, page = 0, limit = 10 } = req.query;
+    if (genre_id === undefined) {
+      return res.status(404).json({ err: "Not found story" });
+    }
+    const data:Array<Story> = await storysServices.getListStoriesByGenre(
+      genre_id?.toString(),
+      Number(page),
+      Number(limit),
+    );
+    console.log(data.length);
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(400).json({ err: "erro some thing" });
   }
 };

@@ -101,3 +101,16 @@ export const userInfoAccountController = async (
     return res.status(404).json({ err: "Not found account" });
   }
 };
+export const donateMoneyFromUserController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const {user_id, money, story_id, author_id} = req.body;
+
+    await usersServices.donateMoneyFromUser(user_id, Number(money), story_id, author_id);
+    return res.status(200).json("success");
+  } catch (err) {
+    return res.status(400).json({ err: err });
+  }
+};

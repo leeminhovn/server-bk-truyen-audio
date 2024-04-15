@@ -153,5 +153,62 @@ class userService {
       return null;
     }
   }
+  async donateMoneyFromUser(
+    user_idPoprs: string,
+    money: number,
+    story_idPorps: string,
+    author_idPorps: string,
+  ) {
+    const user_id: ObjectId = new ObjectId(user_idPoprs);
+    const story_id: ObjectId = new ObjectId(story_idPorps);
+    const author_id =
+      author_idPorps.length > 0 ? new ObjectId(author_idPorps) : "";
+
+    try {
+      const currentUser: User | null = await databaseServices.users.findOne({
+        user_id: user_id,
+      });
+
+      if (currentUser === null) {
+        return;
+      }
+      if (money > currentUser.spirit_stone.valueOf()) {
+        return;
+      }
+      // cập nhật tiền của tác giả
+      // thêm lịch sử giao dịch cho tác giả
+      // cập nhật tiền cho truyện
+      if (author_id) {
+        const author = await databaseServices.adminAccounts.findOne({
+          _id: author_id,
+        });
+        if (author !== null) {
+          await databaseServices.adminAccounts.findOneAndUpdate(
+            {
+              _id: author_id,
+            },
+            {
+              $set: {
+                money: author.money + money.valueOf(),
+              },
+            },
+          );
+        }
+      }
+
+      const [story, user] = await Promise.all([
+        databaseServices.storys.findOneAndUpdate(
+          { _id: story_id },
+          { $inc: { money: money } },
+        ),
+        databaseServices.users.findOneAndUpdate(
+          { _id: story_id },
+          { $inc: { money: money } },
+        ),
+      ]);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }
 export default new userService();

@@ -9,6 +9,9 @@ import { arraysHaveSameElements } from "~/helpers/array";
 import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
 import { ReadingHistory } from "~/models/schemas/readingHistory/ReadingHistory.schemas";
 import { create } from "domain";
+import { UserFollowedStory } from "~/models/schemas/userFollowedStory/UserFollowedStory.schemas";
+import { StoryWithIdChapterUpdate } from "~/models/schemas/story/StoryWithIdChapterUpdate.schemas";
+import { StoryGenre } from "~/models/schemas/genre/StoryGenre.schemas";
 
 class storyServices {
   constructor() {}
@@ -139,7 +142,12 @@ class storyServices {
       chapter.story_id = resultStoryInsert.insertedId;
       return new Chapter(chapter);
     });
+    if (resultFindDuplicatedStory == null) {
 
+    await this.removeAndUpdateStoryGenre(
+      resultStoryInsert.insertedId,
+      story_info.story_genre.split(", "),
+    );}
     const resultChapterInsert = await this.batchInsertChapters(
       databaseServices.chapters,
       dataChapters,
@@ -150,7 +158,7 @@ class storyServices {
   }
 
   async getListAllStory(
-    skip: number,
+    page: number,
     limit: number,
     search: string,
   ): Promise<Array<Story>> {
@@ -159,12 +167,12 @@ class storyServices {
       .find(searchQuery)
       .sort({ created_at: -1 })
       .limit(limit)
-      .skip(skip)
+      .skip(page * limit)
       .toArray();
     return result;
   }
   async getListAllStoryOfAuthor(
-    skip: number,
+    page: number,
     limit: number,
     search: string,
     user_id: ObjectId,
@@ -181,7 +189,7 @@ class storyServices {
         .find({ _id: { $in: dataStoryId }, ...searchQuery })
         .sort({ created_at: -1 })
         .limit(limit)
-        .skip(skip)
+        .skip(page * limit)
         .toArray();
       return result;
     } catch (err) {
@@ -277,6 +285,30 @@ class storyServices {
       return [];
     }
   }
+  async getListStoriesByGenre(genre_id: string, page: number, limit: number) {
+    try {
+      console.log(genre_id);
+      const dataNeedGet = await databaseServices.storys_genre
+        .find({
+          genre_type_id: new ObjectId(genre_id),
+        })
+        .sort({ create_at: -1 })
+        .project({ story_id: 1 })
+        .limit(limit)
+        .skip(limit * page)
+        .toArray();
+
+      console.log(dataNeedGet);
+      return await this.getListStoriesById(
+        dataNeedGet.map((data) => {
+          console.log(data.story_id.toString());
+          return data.story_id.toString();
+        }),
+      );
+    } catch (err) {
+      return [];
+    }
+  }
   async getNextChapter(
     story_id: string,
     index: number,
@@ -348,7 +380,6 @@ class storyServices {
           })) + 1;
 
         if (readHistory.index === 1) {
-          console.log("update count read");
           // update lượt đọc của bộ truyện đó
 
           databaseServices.storys.findOneAndUpdate(
@@ -382,7 +413,6 @@ class storyServices {
     user_id: string,
   ): Promise<Array<Story>> {
     try {
-      console.log(device_uuid, user_id);
       const pipeline = [
         {
           $match: {
@@ -420,12 +450,10 @@ class storyServices {
     device_uuid: string,
   ): Promise<Chapter | null> {
     try {
-      console.log(story_id, user_id);
-
       const queryHistory = {
         story_id: new ObjectId(story_id),
-        [user_id.length > 0 ? "user_id" : "device_uuid"]:
-          user_id.length > 0 ? new ObjectId(user_id) : device_uuid,
+        device_uuid: device_uuid,
+        user_id: user_id.length > 0 ? new ObjectId(user_id) : "",
       };
       const history: ReadingHistory[] =
         await databaseServices.reading_history_user
@@ -445,19 +473,139 @@ class storyServices {
     }
   }
   async getCheckUserNeedSynchronized(
-    story_id: string,
     user_id: string,
+    device_uuid: string,
   ): Promise<boolean> {
     try {
-      const isFoundAccountStoryReading =
-        databaseServices.reading_history_user.findOne({
-          story_id: new ObjectId(story_id),
-          user_id: new ObjectId(user_id),
-        });
-
+      // thường là user đọc được một thời gian rồi, sau đó mới là tạo tài khoản
+      const [isFoundAccountStoryReading, isFoundHistoryByOnlyDeviceUuid] =
+        await Promise.all([
+          databaseServices.reading_history_user.findOne({
+            user_id: new ObjectId(user_id),
+          }),
+          databaseServices.reading_history_user.findOne({
+            device_uuid: device_uuid,
+            user_id: "",
+          }),
+        ]);
+      // trường hợp tài khoản này đã có thông tin lịch sử đọc trước đó
+      if (isFoundAccountStoryReading !== null) {
+        if (isFoundHistoryByOnlyDeviceUuid) {
+          // xoá tất cả lịch sử của device
+          databaseServices.reading_history_user.deleteMany({
+            device_uuid: device_uuid,
+            user_id: "",
+          });
+        }
+        return false;
+      } else if (isFoundHistoryByOnlyDeviceUuid == null) {
+        return false;
+      }
       return true;
     } catch (err) {
       return false;
+    }
+  }
+  async makeSynchronizedForUser(
+    device_uuid: string,
+    user_id: string,
+    is_synchronized: boolean,
+  ) {
+    try {
+      if (is_synchronized) {
+        await databaseServices.reading_history_user.updateMany(
+          { device_uuid: device_uuid, user_id: "" },
+          { $set: { user_id: new ObjectId(user_id) } },
+        );
+      } else {
+        await databaseServices.reading_history_user.deleteMany({
+          device_uuid: device_uuid,
+          user_id: "",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async getFollowedStories(
+    user_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Array<StoryWithIdChapterUpdate>> {
+    try {
+      const data_id_love = await databaseServices.user_followed_stories
+        .find({ user_id: new ObjectId(user_id) })
+        .sort({ created_at: -1 })
+        .limit(limit)
+        .skip(page * limit)
+        .project({ story_id: 1, id_new_chapter: 1 })
+        .toArray();
+
+      const listStories: Array<Story> = await this.getListStoriesById(
+        data_id_love.map(({ story_id }) => story_id),
+      );
+      return listStories.map((dataStory, index) => {
+        return new StoryWithIdChapterUpdate({
+          story: dataStory,
+          id_new_chapter: data_id_love[index].id_new_chapter,
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+  async updateFollowStory(
+    user_idProps: string,
+    story_idProps: string,
+    status_followed: boolean,
+  ) {
+    const user_id: ObjectId = new ObjectId(user_idProps);
+    const story_id: ObjectId = new ObjectId(story_idProps);
+
+    try {
+      if (status_followed === false) {
+        await databaseServices.user_followed_stories.deleteOne({
+          story_id: story_id,
+          user_id: user_id,
+        });
+      } else {
+        const isFoundFollowedBeforeInStory: UserFollowedStory | null =
+          await databaseServices.user_followed_stories.findOne({
+            story_id: story_id,
+            user_id: user_id,
+          });
+        if (isFoundFollowedBeforeInStory === null) {
+          const newFollowedStory: UserFollowedStory = new UserFollowedStory({
+            user_id: user_id,
+            story_id: story_id,
+          });
+          await Promise.all([
+            databaseServices.user_followed_stories.insertOne(newFollowedStory),
+            databaseServices.storys.findOneAndUpdate(
+              { _id: story_id },
+              {
+                $inc: { count_followers_story: 1 },
+              },
+            ),
+          ]);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async getFollowedStoryInfo(
+    user_id: string,
+    story_id: string,
+  ): Promise<UserFollowedStory | null> {
+    try {
+      return await databaseServices.user_followed_stories.findOne({
+        user_id: new ObjectId(user_id),
+        story_id: new ObjectId(story_id),
+      });
+    } catch (err) {
+      return null;
     }
   }
 }

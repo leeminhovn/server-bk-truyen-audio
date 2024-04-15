@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  donateMoneyFromUserController,
   emailVerifyValidator,
   loginController,
   logoutController,
@@ -34,4 +35,5 @@ usersRouter.post(
 usersRouter.get("/user-info-account", userInfoAccountController);
 usersRouter.post("/author-update-block-status", authMiddeware);
 
+usersRouter.post("/donate-money-from-user",donateMoneyFromUserController);
 export default usersRouter;

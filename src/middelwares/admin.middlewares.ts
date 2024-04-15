@@ -23,6 +23,10 @@ export const adminLoginValidator = async (
     });
   } else if (accountCheck.password !== hasPassword(password)) {
     return res.status(400).json({ error: "Password is wrong" });
+  } else if(accountCheck.isBlock === true) {
+    return res.status(400).json({
+      error: "Account is block",
+    });
   }
   _req.body.dataUser = accountCheck;
   next();
