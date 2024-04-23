@@ -8,10 +8,8 @@ import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
 import { arraysHaveSameElements } from "~/helpers/array";
 import { StoryOfAuthor } from "~/models/schemas/story/StoryOfAuthor.schemas";
 import { ReadingHistory } from "~/models/schemas/readingHistory/ReadingHistory.schemas";
-import { create } from "domain";
 import { UserFollowedStory } from "~/models/schemas/userFollowedStory/UserFollowedStory.schemas";
 import { StoryWithIdChapterUpdate } from "~/models/schemas/story/StoryWithIdChapterUpdate.schemas";
-import { StoryGenre } from "~/models/schemas/genre/StoryGenre.schemas";
 
 class storyServices {
   constructor() {}
@@ -19,18 +17,24 @@ class storyServices {
     story_id: ObjectId,
     genersNew: Array<String>,
   ) {
-    const [_, listIdGenre]: [DeleteResult, WithId<GenreTypes>[]] =
-      await Promise.all([
-        databaseServices.storys_genre.deleteMany({
-          story_id: story_id,
-        }),
-        databaseServices.genres.find({ title: { $in: genersNew } }).toArray(),
-      ]);
-    // update thể loại
-    const listGenresUpdate = listIdGenre.map((e) => {
-      return { story_id, genre_type_id: e._id };
-    });
-    databaseServices.storys_genre.insertMany(listGenresUpdate);
+    try {
+      const [_, listIdGenre]: [DeleteResult, WithId<GenreTypes>[]] =
+        await Promise.all([
+          databaseServices.storys_genre.deleteMany({
+            story_id: story_id,
+          }),
+          databaseServices.genres.find({ title: { $in: genersNew } }).toArray(),
+        ]);
+      // update thể loại
+      const listGenresUpdate = listIdGenre.map((e) => {
+        return { story_id, genre_type_id: e._id };
+      });
+      if (listGenresUpdate.length > 0) {
+        await databaseServices.storys_genre.insertMany(listGenresUpdate);
+      }
+    } catch (err) {
+      console.log(err, "teoo");
+    }
   }
   private async getAllStoryOfAuthorDocument(
     authorId: ObjectId,
@@ -43,7 +47,6 @@ class storyServices {
 
       return data;
     } catch (err) {
-      console.log(err);
       return [];
     }
   }
@@ -75,9 +78,12 @@ class storyServices {
       const batch = data.slice(i, i + batchSize);
       // Chèn từng lô vào cơ sở dữ liệu
       try {
-        await collection.insertMany(batch);
+        if (batch.length > 0) {
+          await collection.insertMany(batch);
+        }
       } catch (err) {
-        console.log(err);
+        console.log(err, "checckk1");
+
         return false;
       }
     }
@@ -93,20 +99,25 @@ class storyServices {
     return true;
   }
   async handlePrepareStoryNeedUpdate(story_info: Story): Promise<boolean> {
-    const resultFindDuplicatedStory: WithId<Story> | null =
-      await databaseServices.storys.findOne({
-        story_name: story_info.story_name,
-        auhtor_name: story_info.auhtor_name,
-      });
+    try {
+      const resultFindDuplicatedStory: WithId<Story> | null =
+        await databaseServices.storys.findOne({
+          story_name: story_info.story_name,
+          auhtor_name: story_info.auhtor_name,
+        });
 
-    if (
-      resultFindDuplicatedStory !== null &&
-      resultFindDuplicatedStory.completed_status ===
-        StoryCompletedStatus.Completed
-    ) {
+      if (
+        resultFindDuplicatedStory !== null &&
+        resultFindDuplicatedStory.completed_status ===
+          StoryCompletedStatus.Completed
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (err) {
+      console.log("checkk4");
       return false;
-    } else {
-      return true;
     }
   }
   async uploadStory(story_info: Story, chapters: Array<Chapter>) {
@@ -137,23 +148,23 @@ class storyServices {
 
     const resultStoryInsert: InsertOneResult<Story> =
       await databaseServices.storys.insertOne(story_info);
-
     const dataChapters = chapters.map((chapter) => {
       chapter.story_id = resultStoryInsert.insertedId;
       return new Chapter(chapter);
     });
-    if (resultFindDuplicatedStory == null) {
 
-    await this.removeAndUpdateStoryGenre(
-      resultStoryInsert.insertedId,
-      story_info.story_genre.split(", "),
-    );}
+    if (resultFindDuplicatedStory == null) {
+      await this.removeAndUpdateStoryGenre(
+        resultStoryInsert.insertedId,
+        story_info.story_genre.split(", "),
+      );
+    }
     const resultChapterInsert = await this.batchInsertChapters(
       databaseServices.chapters,
       dataChapters,
       2000,
     );
-
+    console.log(resultChapterInsert);
     return resultStoryInsert;
   }
 
@@ -163,6 +174,7 @@ class storyServices {
     search: string,
   ): Promise<Array<Story>> {
     const searchQuery = search.length > 0 ? { $text: { $search: search } } : {};
+    console.log(await databaseServices.storys.countDocuments());
     const result: Array<Story> = await databaseServices.storys
       .find(searchQuery)
       .sort({ created_at: -1 })
@@ -170,6 +182,7 @@ class storyServices {
       .skip(page * limit)
       .toArray();
     return result;
+  
   }
   async getListAllStoryOfAuthor(
     page: number,

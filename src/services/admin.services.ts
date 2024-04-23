@@ -135,7 +135,7 @@ class adminServices {
 
     return result;
   }
-  async getListAllAuthor(skip: number, limit: number, search: string) {
+  async getListAllAuthor(page: number, limit: number, search: string) {
     const searchQuery = {
       $and: [
         { role: { $ne: "Admin" } }, // Lọc các tài khoản có role khác "Admin"
@@ -147,7 +147,7 @@ class adminServices {
       .sort({ created_at: -1 })
 
       .limit(limit)
-      .skip(skip)
+      .skip(page * limit)
       .toArray();
 
     return result;

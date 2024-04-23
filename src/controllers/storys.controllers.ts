@@ -1,4 +1,3 @@
-import exp from "constants";
 import { Request, Response } from "express";
 import { InsertOneResult, ObjectId } from "mongodb";
 import { GenreTypes } from "~/models/schemas/genre/GenreTypes.schemas";
@@ -46,18 +45,20 @@ export const getAllStoryListController = async (
   res: Response,
 ) => {
   const page: number = Number(req.query.page) || 0;
+
   const limit: number = Number(req.query.limit) || 20;
   const search: string =
     req.query?.search !== undefined ? req.query?.search.toString() : "";
+  console.log(page, limit, search + "123");
 
   try {
     const data_storys: Array<Story> = await storysServices.getListAllStory(
-      page * limit,
+      page ,
       limit,
       search,
     );
-
-    return res.json(data_storys);
+    console.log(data_storys.length, "check");
+    return res.status(200).json(data_storys);
   } catch (err) {
     console.log(err);
     res.status(400).json(err);
@@ -133,9 +134,14 @@ export const handlePrepareUpdateStoryControler = async (
   res: Response,
 ) => {
   const story_info: Story = req.body;
-  const statusAcceptUpdate: boolean =
-    await storysServices.handlePrepareStoryNeedUpdate(story_info);
-  return res.status(200).json({ message: statusAcceptUpdate });
+  try {
+    const statusAcceptUpdate: boolean =
+      await storysServices.handlePrepareStoryNeedUpdate(story_info);
+    return res.status(200).json({ message: statusAcceptUpdate });
+  } catch (err) {
+    console.log(err, "checkk3");
+    return res.status(400).json({ error: err });
+  }
 };
 export const getAllGenresController = async (req: Request, res: Response) => {
   const data: Array<GenreTypes> = await storysServices.getAllGenres();
@@ -391,7 +397,7 @@ export const getListStoriesByGenreController = async (
     if (genre_id === undefined) {
       return res.status(404).json({ err: "Not found story" });
     }
-    const data:Array<Story> = await storysServices.getListStoriesByGenre(
+    const data: Array<Story> = await storysServices.getListStoriesByGenre(
       genre_id?.toString(),
       Number(page),
       Number(limit),

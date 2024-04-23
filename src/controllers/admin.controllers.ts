@@ -125,7 +125,7 @@ export const adminGetAllListAuthorsController = async (
 
   try {
     const data_storys = await adminServices.getListAllAuthor(
-      page * limit,
+      page ,
       limit,
       search,
     );

@@ -6,7 +6,10 @@ import { adminStoryInfoUpdateMiddleWare } from "~/middelwares/story.middlewares"
 
 const storyRouter = Router();
 storyRouter.post("/upload-story", storyController.uploadStoryController);
+
 storyRouter.get("/get-all-storys", getAllStoryListController);
+
+// 192.168.0.105:5000 
 storyRouter.get(
   "/get-storys-of-author",
   storyController.getAllStoryOfAuthorListController,
