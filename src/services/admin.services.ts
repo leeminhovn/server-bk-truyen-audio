@@ -145,7 +145,6 @@ class adminServices {
     const result = await databaseServices.adminAccounts
       .find(searchQuery)
       .sort({ created_at: -1 })
-
       .limit(limit)
       .skip(page * limit)
       .toArray();

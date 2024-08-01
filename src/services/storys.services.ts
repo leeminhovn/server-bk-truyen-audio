@@ -82,7 +82,6 @@ class storyServices {
           await collection.insertMany(batch);
         }
       } catch (err) {
-        console.log(err, "checckk1");
 
         return false;
       }
@@ -116,7 +115,6 @@ class storyServices {
         return true;
       }
     } catch (err) {
-      console.log("checkk4");
       return false;
     }
   }
@@ -164,7 +162,6 @@ class storyServices {
       dataChapters,
       2000,
     );
-    console.log(resultChapterInsert);
     return resultStoryInsert;
   }
 
@@ -174,7 +171,6 @@ class storyServices {
     search: string,
   ): Promise<Array<Story>> {
     const searchQuery = search.length > 0 ? { $text: { $search: search } } : {};
-    console.log(await databaseServices.storys.countDocuments());
     const result: Array<Story> = await databaseServices.storys
       .find(searchQuery)
       .sort({ created_at: -1 })
@@ -300,7 +296,6 @@ class storyServices {
   }
   async getListStoriesByGenre(genre_id: string, page: number, limit: number) {
     try {
-      console.log(genre_id);
       const dataNeedGet = await databaseServices.storys_genre
         .find({
           genre_type_id: new ObjectId(genre_id),
@@ -311,10 +306,8 @@ class storyServices {
         .skip(limit * page)
         .toArray();
 
-      console.log(dataNeedGet);
       return await this.getListStoriesById(
         dataNeedGet.map((data) => {
-          console.log(data.story_id.toString());
           return data.story_id.toString();
         }),
       );

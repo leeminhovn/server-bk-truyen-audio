@@ -49,15 +49,13 @@ export const getAllStoryListController = async (
   const limit: number = Number(req.query.limit) || 20;
   const search: string =
     req.query?.search !== undefined ? req.query?.search.toString() : "";
-  console.log(page, limit, search + "123");
 
   try {
     const data_storys: Array<Story> = await storysServices.getListAllStory(
-      page ,
+      page,
       limit,
       search,
     );
-    console.log(data_storys.length, "check");
     return res.status(200).json(data_storys);
   } catch (err) {
     console.log(err);
@@ -139,7 +137,6 @@ export const handlePrepareUpdateStoryControler = async (
       await storysServices.handlePrepareStoryNeedUpdate(story_info);
     return res.status(200).json({ message: statusAcceptUpdate });
   } catch (err) {
-    console.log(err, "checkk3");
     return res.status(400).json({ error: err });
   }
 };
@@ -227,7 +224,6 @@ export const addReadHistoryForUserController = async (
 ) => {
   try {
     const { history_read } = req.body;
-    console.log(req.body, "check");
     const readHistory: ReadingHistory = new ReadingHistory(history_read);
     await storysServices.addReadHistoryForUser(readHistory);
     res.status(200).json({ message: "Success add history" });
@@ -336,7 +332,6 @@ export const updateFollowStoryController = async (
 ) => {
   try {
     const { user_id, story_id, status_follow } = req.body;
-    console.log(status_follow);
     await storysServices.updateFollowStory(
       user_id?.toString() || "",
       story_id?.toString() || "",
@@ -402,7 +397,7 @@ export const getListStoriesByGenreController = async (
       Number(page),
       Number(limit),
     );
-    console.log(data.length);
+    console.log(data.length + "page: " + page);
     return res.status(200).json(data);
   } catch (err) {
     return res.status(400).json({ err: "erro some thing" });
